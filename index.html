@@ -15,7 +15,7 @@
 <style>
 /* Layout: 할일차곡 같은 다크 모바일 앱 — 상단 바 / 본문(학생 기록 또는 매뉴얼) / 하단 탭(목동·사우·매뉴얼) + 분홍 추가 버튼 / 하단 시트 입력 */
 :root{
-  --bg:#FFFFFF; --bar:#FFFFFF; --surface:#F5F5F7; --surface2:#EAEAEE; --line:#E4E4E9;
+  --bg:#FFFFFF; --bar:#FFFFFF; --page:#EDEFF3; --surface:#F3F4F7; --surface2:#E7E9EE; --line:#DEE1E7;
   --fg:#1F1F24; --muted:#7C7C87; --pink:#EE5A68; --pink-soft:#FDE6E9;
   --blue:#2F6FC4; --blue-bg:#E4EEFB; --check:#3F86DD;
   --green:#2E8A4A; --green-bg:#E2F3E6;
@@ -28,7 +28,7 @@
 }
 *{box-sizing:border-box}
 html,body{height:100%}
-body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.55}
+body{background:var(--page);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.55}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bar)}
 button{font-family:inherit;color:inherit}
 button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid var(--pink);outline-offset:2px}
@@ -177,6 +177,30 @@ main{flex:1;padding-block:14px 120px;padding-left:max(16px,env(safe-area-inset-l
 .ev{background:var(--surface);color:var(--fg);border-left:3px solid var(--oc,var(--line))}
 .more{font-size:11px;color:var(--muted);padding-left:3px}
 .day-panel{margin-top:14px}
+.app:not(.home) main{background:var(--bg)}
+.cal{background:var(--bg);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.cal .wh{border-bottom:1px solid var(--line)}
+.cell{border-right:1px solid var(--line)}
+.cell:nth-child(7n+7){border-right:0}
+.calpop .evrow{flex-wrap:wrap;row-gap:6px}
+.calpop .evrow .t{flex:1 1 calc(100% - 40px)}
+.calpop .evrow .tm{order:-1}
+.calwrap{position:relative}
+.calpop{position:absolute;z-index:15;width:340px;max-height:420px;overflow:auto;background:var(--bg);border:1px solid var(--line);border-radius:16px;box-shadow:0 12px 32px rgba(0,0,0,.14);padding:14px;visibility:hidden}
+.calpop .cp-h{display:flex;align-items:flex-start;gap:4px;margin-bottom:10px}
+.calpop .cp-h>div:first-child{flex:1}
+.calpop .cp-t{font-family:var(--title);font-size:18px}
+.calpop .cp-t .wd{font-size:13px;color:var(--muted)} .calpop .cp-t .wd.sun{color:var(--pink)} .calpop .cp-t .wd.sat{color:var(--blue)}
+.calpop .cp-s{font-size:13px;color:var(--muted);margin-top:2px}
+.calpop .cp-add{width:36px;height:36px;border:0;border-radius:10px;background:var(--pink);color:#fff;font-size:22px;cursor:pointer;margin-right:6px}
+.calpop .cp-nav{width:30px;height:36px;border:0;background:transparent;color:var(--muted);font-size:16px;cursor:pointer;border-radius:8px}
+.calpop .cp-nav:hover{background:var(--surface)}
+.calpop .cp-empty{border:1px dashed var(--line);border-radius:12px;padding:18px;text-align:center;color:var(--muted);font-size:14px;line-height:1.6}
+.calpop .rows{display:flex;flex-direction:column;gap:6px;margin:0;padding:0;list-style:none}
+.cal-addtop{border:0;background:var(--pink);color:#fff;border-radius:10px;padding:8px 14px;font-family:var(--title);font-size:15px;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:8px}
+.cal-addtop kbd{font:11px var(--body);background:rgba(255,255,255,.25);border-radius:5px;padding:1px 5px}
+@media (max-width:899px){ .cal-addtop kbd{display:none} }
+@media (min-width:900px){ .cell{min-height:110px} }
 .evrow{background:var(--surface);border-radius:12px;padding:10px 12px;display:flex;gap:10px;align-items:center}
 .evrow .t{flex:1;min-width:0;word-break:break-word}
 .evrow.done .t{text-decoration:line-through;color:var(--muted)}
@@ -240,6 +264,9 @@ main{flex:1;padding-block:14px 120px;padding-left:max(16px,env(safe-area-inset-l
   .app{max-width:none;margin:0 0 0 84px}
   main{padding-block:18px 40px;width:100%;max-width:780px;margin:0 auto}
   .app.home main{max-width:1320px}
+  .app:not(.home) main{max-width:820px;margin:20px auto 40px;padding:22px 26px 32px;border:1px solid var(--line);border-radius:20px;box-shadow:0 1px 3px rgba(20,24,40,.04)}
+  .app.calv main{max-width:1240px}
+  .app:not(.home) .top{background:var(--bar)}
   .app.home .top{background:var(--bar)}
   .dash{grid-template-columns:repeat(3,minmax(0,1fr));grid-template-areas:"cal alert quick" "cal up man"}
   .w-cal{grid-area:cal}.w-alert{grid-area:alert}.w-quick{grid-area:quick}.w-up{grid-area:up}.w-man{grid-area:man}
@@ -278,7 +305,7 @@ textarea.field{min-height:96px;resize:vertical}
   padding:8px 16px;border-radius:10px;font-size:14px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:30;white-space:nowrap}
 .toast.show{opacity:1}
 @media (prefers-reduced-motion:reduce){.toast{transition:none}}
-html,body{background:var(--bg)}
+html,body{background:var(--page);margin:0}
 #gate{position:fixed;inset:0;z-index:50;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:24px 16px}
 #gate[hidden]{display:none}
 #gate .gbox{width:100%;max-width:360px;display:flex;flex-direction:column;gap:12px}
@@ -432,7 +459,7 @@ html,body{background:var(--bg)}
     if(!S.staff && !isMan()) S.tab="매뉴얼";
     document.querySelectorAll(".tab").forEach(t=>{t.setAttribute("aria-selected",t.dataset.tab===S.tab);if(t.dataset.tab!=="매뉴얼")t.hidden=!S.staff});
     const chip=$("#branchChip");
-    $("#app").classList.toggle("home",isHome());
+    $("#app").classList.toggle("home",isHome()); $("#app").classList.toggle("calv",isCal());
     if(isHome()){
       chip.textContent=""; chip.className="branch-chip"; $("#backBtn").hidden=true;
       $("#topTitle").textContent="대시보드"; $("#fab").setAttribute("aria-label","일정 추가");
@@ -699,25 +726,45 @@ html,body{background:var(--bg)}
           <div class="wh2" style="color:${wd===0?"var(--pink)":wd===6?"var(--blue)":"inherit"}">${fmt(ds)} <span class="wd">${"일월화수목금토"[wd]}</span></div>
           ${evs.map(e=>`<div class="wev ${oc(e.owner)} ${e.done?"done":""}">${e.time?`<span class="tm">${esc(e.time)}</span>`:""}${esc(e.title)}</div>`).join("")||'<span class="sub">-</span>'}
         </div>`}).join("")}</div>`;
-    } else body=`<div class="cal">${wkHead()}${cells}</div>`;
+    } else {
+      const popOn=S.calPop&&wideCal(), dn=dayEv.filter(e=>e.done).length;
+      body=`<div class="calwrap"><div class="cal">${wkHead()}${cells}</div>${popOn?`<div class="calpop" id="calpop" role="dialog" aria-label="${fmt(selD)} 일정">
+        <div class="cp-h"><div><div class="cp-t">${+selD.slice(8)}일 <span class="wd ${w===0?"sun":w===6?"sat":""}">${"일월화수목금토"[w]}요일</span></div><div class="cp-s">일정 ${dayEv.length-dn}개 · 완료 ${dn}개</div></div>
+          ${canWrite()?`<button class="cp-add" data-act="cal-add" aria-label="이 날짜에 일정 추가">+</button>`:""}
+          <button class="cp-nav" data-act="pop-prev" aria-label="전날">‹</button><button class="cp-nav" data-act="pop-next" aria-label="다음날">›</button><button class="cp-nav" data-act="pop-close" aria-label="닫기">✕</button></div>
+        ${dayEv.length?`<ul class="rows">${evRows(dayEv)}</ul>`:`<div class="cp-empty">이 날짜에는 일정이 없습니다.<br>+ 를 눌러 추가하세요.</div>`}
+      </div>`:""}</div>`;
+    }
     m.innerHTML=`${S.err?`<p class="status">${esc(S.err)}</p>`:""}
       <div class="ctools">
         <div class="cal-nav" style="margin:0"><button class="icon-btn" data-act="cal-prev" aria-label="이전">‹</button><span class="ym">${navLabel}</span><button class="icon-btn" data-act="cal-next" aria-label="다음">›</button></div>
         <div class="vseg">${["월","주"].map(v=>`<button data-calview="${v}" aria-pressed="${S.calView===v}">${v}</button>`).join("")}</div>
         <input class="search" id="calq" type="text" placeholder="일정 검색" value="${esc(S.calQ)}">
+        ${canWrite()?`<button class="cal-addtop" data-act="cal-add">+ 일정 <kbd>Ctrl K</kbd></button>`:""}
       </div>
       <div class="fbar">${[""].concat(OWN).map(o=>`<button class="fchip ${oc(o)}" data-calown="${o}" aria-pressed="${S.calOwn===o}">${o?`<span class="sw"></span>${o}`:"담당 전체"}</button>`).join("")}</div>
       ${body}
-      <div class="day-panel" ${ts.length?"hidden":""}>
+      <div class="day-panel" ${ts.length||(!isWeek&&wideCal())?"hidden":""}>
         <div class="sec">${fmt(selD)} <span class="wd">${"일월화수목금토"[w]}요일</span><span class="n">${dayEv.length}</span><span class="sp"></span>${selD!==t?`<button class="mini" data-act="cal-today">오늘</button>`:""}</div>
-        ${dayEv.length?`<ul class="rows">${dayEv.map(e=>`<li class="evrow ${e.done?"done":""}">
+        ${dayEv.length?`<ul class="rows">${evRows(dayEv)}</ul>`:`<div class="sub">일정이 없습니다. + 를 눌러 이 날짜에 일정을 추가하세요.</div>`}
+      </div>`;
+    placePop();
+  }
+  function evRows(list){ return list.map(e=>`<li class="evrow ${e.done?"done":""}">
           <button class="ck ${e.done?"done":""}" data-act="ev-ck" data-id="${e.id}" aria-label="${e.done?"완료 취소":"완료"}" ${canWrite()?"":"disabled"}>${e.done?CHECK:""}</button>
           ${e.time?`<span class="tm">${esc(e.time)}</span>`:""}
           <span class="t">${esc(e.title)}</span>
           ${evChips(e)}
           ${canWrite()?(S.confirmDel===e.id?`<button class="mini danger" data-act="ev-del-yes" data-id="${e.id}">삭제</button><button class="mini" data-act="del-no">취소</button>`:`<button class="mini" data-act="ev-edit" data-id="${e.id}">수정</button><button class="mini" data-act="ev-del" data-id="${e.id}" aria-label="삭제">✕</button>`):""}
-        </li>`).join("")}</ul>`:`<div class="sub">일정이 없습니다. + 를 눌러 이 날짜에 일정을 추가하세요.</div>`}
-      </div>`;
+        </li>`).join(""); }
+  const wideCal=()=>matchMedia("(min-width:900px)").matches;
+  function placePop(){
+    const pop=$("#calpop"), wrap=$(".calwrap"); if(!pop||!wrap) return;
+    const cell=wrap.querySelector(`.cell[data-day="${S.cal.d}"]`); if(!cell){ pop.remove(); return; }
+    const W=wrap.getBoundingClientRect(), C=cell.getBoundingClientRect(), pw=pop.offsetWidth, ph=pop.offsetHeight;
+    let x=C.right-W.left+8; if(x+pw>W.width) x=C.left-W.left-pw-8; if(x<0) x=Math.max(0,(W.width-pw)/2);
+    let y=C.top-W.top; const maxY=Math.max(0,W.height-ph); if(y>maxY) y=maxY;
+    pop.style.left=x+"px"; pop.style.top=y+"px"; pop.style.visibility="visible";
   }
 
   /* ---------- manual ---------- */
@@ -941,7 +988,10 @@ html,body{background:var(--bg)}
     if(id==="nsort"){ S.nSort=e.target.value; render(); }
     if(id==="nperiod"){ S.nPeriod=e.target.value; render(); }
   });
-  document.addEventListener("keydown",e=>{ if(e.key==="Enter"&&e.target.classList?.contains("wcol")) e.target.click(); });
+  document.addEventListener("keydown",e=>{ if(e.key==="Enter"&&e.target.classList?.contains("wcol")) e.target.click();
+    if(e.key==="Escape"&&S.calPop&&!S.sheet){ S.calPop=false; render(); }
+    if((e.ctrlKey||e.metaKey)&&(e.key==="k"||e.key==="K")&&isCal()&&canWrite()&&!S.sheet){ e.preventDefault(); S.branchPick="공통"; S.ownerPick=S.calOwn||""; openSheet("event"); } });
+  addEventListener("resize",()=>{ if(S.calPop) placePop(); });
 
   document.addEventListener("click",async e=>{
     const tab=e.target.closest(".tab");
@@ -976,8 +1026,8 @@ html,body{background:var(--bg)}
     const bs=e.target.closest("[data-bsel]");
     if(bs){ S.branch=bs.dataset.bsel; S.sel=null; S.search=""; try{localStorage.setItem("jlog-branch",S.branch)}catch(_){}; render(); return; }
     const day=e.target.closest("[data-day]");
-    if(day){ const d=day.dataset.day; if(day.dataset.clearq) S.calQ=""; S.cal.d=d; S.cal.y=+d.slice(0,4); S.cal.m=+d.slice(5,7); S.confirmDel=null; render(); return; }
-    if(tab){ S.tab=tab.dataset.tab; S.sel=null; S.search=""; S.confirmDel=null; if(isMan()) S.m={kind:"home",id:null};
+    if(day){ const d=day.dataset.day; if(day.dataset.clearq) S.calQ=""; S.calPop=day.classList.contains("cell")?!(S.calPop&&S.cal.d===d):false; S.cal.d=d; S.cal.y=+d.slice(0,4); S.cal.m=+d.slice(5,7); S.confirmDel=null; render(); return; }
+    if(tab){ S.tab=tab.dataset.tab; S.calPop=false; S.sel=null; S.search=""; S.confirmDel=null; if(isMan()) S.m={kind:"home",id:null};
       try{localStorage.setItem("jlog-tab",S.tab)}catch(_){}; render(); scrollTo(0,0); return; }
     if(e.target.closest("#backBtn")){
       if(isMan()){ const it=S.m.kind==="item"&&S.manual.find(x=>x.id===S.m.id); S.m=(it&&!S.mq.trim())?{kind:"chapter",id:it.chapterId}:{kind:"home",id:null}; S.showHist=false; }
@@ -993,9 +1043,13 @@ html,body{background:var(--bg)}
     const ty=e.target.closest("[data-type]"); if(ty){ S.type=ty.dataset.type; renderSheet(); return; }
     const br=e.target.closest("[data-branch]"); if(br){ S.branchPick=br.dataset.branch; renderSheet(); return; }
     const an=e.target.closest("[data-addnote]"); if(an){ if(!canWrite()||!S.sel) return; S.type=an.dataset.addnote; openSheet("note"); return; }
+    if(S.calPop&&!e.target.closest("#calpop")&&!e.target.closest("#sheetRoot")&&!e.target.closest("[data-act]")){ S.calPop=false; render(); return; }
     const b=e.target.closest("[data-act]"); if(!b) return;
     const act=b.dataset.act, id=b.dataset.id;
     if(act==="close"){ closeSheet(); return; }
+    if(act==="cal-add"){ if(!canWrite()) return; S.branchPick="공통"; S.ownerPick=S.calOwn||""; openSheet("event"); return; }
+    if(act==="pop-close"){ S.calPop=false; render(); return; }
+    if(act==="pop-prev"||act==="pop-next"){ const d=addDays(S.cal.d,act==="pop-next"?1:-1); S.cal={y:+d.slice(0,4),m:+d.slice(5,7),d}; S.confirmDel=null; render(); return; }
     if(act==="logout"){ await JDB.sb.auth.signOut(); location.reload(); return; }
     if(act==="approve"||act==="revoke"){ if(!S.isOwner) return; const {data,error}=await JDB.sb.from("profiles").update({role:act==="approve"?"staff":"pending"}).eq("id",id).select("id"); if(error||!data?.length){ toast("변경하지 못했습니다"); return; } toast(act==="approve"?"승인했습니다":"승인을 해제했습니다"); loadPeople(); return; }
     if(act==="arch-toggle"){ S.showArch=!S.showArch; $("#stuItems").innerHTML=stuItems(); b.textContent=S.showArch?"← 재원생 보기":"퇴소생 보기"; return; }
