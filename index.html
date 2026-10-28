@@ -110,6 +110,9 @@ main{flex:1;padding-block:14px 120px;padding-left:max(16px,env(safe-area-inset-l
 .link-btn{margin-top:16px;border:0;background:transparent;color:var(--muted);font-size:14px;cursor:pointer;padding:6px 0}
 .empty{text-align:center;color:var(--muted);padding:40px 10px}
 .sec{font-family:var(--title);font-size:16px;color:var(--muted);margin:22px 0 8px;display:flex;align-items:center;gap:8px}
+.addbar{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 4px}
+.addbtn{border:1px solid var(--line);border-radius:12px;padding:10px 16px;font-family:var(--title);font-size:15px;cursor:pointer;flex:1 1 0;min-width:120px}
+.addbtn:hover{filter:brightness(.96)}
 .sec:first-child{margin-top:4px}
 .sec .n{font-size:13px;background:var(--surface2);border-radius:6px;padding:0 7px}
 .sec .sp{flex:1}
@@ -529,13 +532,14 @@ html,body{background:var(--bg)}
       <div class="fbar"><span class="sub" style="margin:0">학년</span>${canWrite()?GRADES.map(g=>`<button class="fchip" data-sgrade="${g}" aria-pressed="${gradeOf(s)===g}">${g}</button>`).join(""):`<span class="chip c-mute">${esc(gradeOf(s)||"미지정")}</span>`}</div>
       ${(s.programHistory||[]).length?`<div class="sub" style="margin:-4px 0 10px">프로그램 변경: ${(s.programHistory||[]).map(h=>`${fmt(h.date)} ${esc(h.from||"미지정")}→${esc(h.to||"미지정")}${nm(h.by)?" ("+esc(nm(h.by))+")":""}`).join(" · ")}</div>`:""}
       <div class="fbar"><span class="sub" style="margin:0">${s.program==="프리미엄"?"자습 담당":"담당"}</span>${canWrite()?OWN.concat([""]).map(o=>`<button class="fchip ${oc(o)}" data-sowner="${o}" aria-pressed="${(s.owner||"")===o}">${o?`<span class="sw"></span>${o}`:"없음"}</button>`).join(""):`<span class="ochip ${oc(s.owner)}">${esc(s.owner||"없음")}</span>`}</div>
+      ${canWrite()?`<div class="addbar">${["학습방향","경고","유지사항"].map(k=>`<button type="button" class="addbtn ${typeCls(k)}" data-addnote="${k}">+ ${k==="학습방향"?"학습방향 점검":k}</button>`).join("")}</div>`:""}
       <div class="sec">📌 고정 유지사항 <span class="n">${pinned.length}</span></div>
       ${pinned.length?`<div class="pins">${pinned.map(n=>`
         <div class="pin-card ${n.type==="경고"?"warn":n.type==="학습방향"?"dir":""}">
           <div class="txt"><div class="when">${fmt(n.date)} · ${esc(n.type)}${n.alertDate?` · 🔔 ${fmt(n.alertDate)}`:""}</div>${esc(n.content)}${n.nextStep?`<div class="sub next">재발 시: ${esc(n.nextStep)}</div>`:""}${ruleOf(n.ruleId)?`<div style="margin-top:4px">${ruleChip(n)}</div>`:""}</div>
           ${canWrite()?`<div style="display:flex;flex-direction:column;gap:6px"><button class="mini" data-act="n-edit" data-id="${n.id}">수정</button><button class="mini" data-act="unpin" data-id="${n.id}">해제</button></div>`:""}
         </div>`).join("")}</div>`
-        :`<div class="sub">고정된 항목이 없습니다. 계속 기억해야 할 내용은 + 에서 「유지사항」으로 남기세요.</div>`}
+        :`<div class="sub">고정된 항목이 없습니다. 계속 기억해야 할 내용은 위의 「+ 유지사항」으로 남기세요.</div>`}
       <div class="sec">이번에 확인할 항목 <span class="n">${open.length}</span></div>
       ${open.length?`<ul class="rows">${open.map(rowHTML).join("")}</ul>`:`<div class="sub">확인할 항목이 없습니다.</div>`}
       <div class="sec">전체 기록 <span class="n">${fl.length}${fl.length!==ns.length?" / "+ns.length:""}</span></div>
@@ -546,7 +550,7 @@ html,body{background:var(--bg)}
       ${dayKeys.length?dayKeys.map(d=>{const w=wdIdx(d);return `<div class="day">
         <div class="day-h">${fmt(d)} <span class="wd ${w===0?"sun":w===6?"sat":""}">${"일월화수목금토"[w]}</span></div>
         <ul class="rows">${days[d].map(rowHTML).join("")}</ul></div>`}).join("")
-        :`<div class="empty">${ns.length?"조건에 맞는 기록이 없습니다.":"아직 기록이 없습니다.<br>+ 를 눌러 첫 기록을 남기세요."}</div>`}
+        :`<div class="empty">${ns.length?"조건에 맞는 기록이 없습니다.":"아직 기록이 없습니다.<br>위의 「+ 학습방향 점검·경고·유지사항」 버튼으로 첫 기록을 남기세요."}</div>`}
       <div style="display:flex;gap:16px;flex-wrap:wrap">
       ${canWrite()?`<button class="link-btn" data-act="archive">${s.active===false?"재원생으로 되돌리기":"이 학생 퇴소 처리"}</button>`:""}
       ${canAdmin()?(S.confirmDel==="stu:"+s.id?`<button class="link-btn" style="color:var(--red)" data-act="stu-del-yes">정말 삭제 (기록 ${ns.length}건도 함께 삭제)</button><button class="link-btn" data-act="del-no">취소</button>`:`<button class="link-btn" data-act="stu-del">잘못 등록한 학생 삭제</button>`):""}
@@ -988,6 +992,7 @@ html,body{background:var(--bg)}
     const mi=e.target.closest("[data-mitem]"); if(mi){ if(!isMan()){ S.tab="매뉴얼"; try{localStorage.setItem("jlog-tab",S.tab)}catch(_){} } S.m={kind:"item",id:mi.dataset.mitem}; S.showHist=false; S.confirmDel=null; render(); scrollTo(0,0); return; }
     const ty=e.target.closest("[data-type]"); if(ty){ S.type=ty.dataset.type; renderSheet(); return; }
     const br=e.target.closest("[data-branch]"); if(br){ S.branchPick=br.dataset.branch; renderSheet(); return; }
+    const an=e.target.closest("[data-addnote]"); if(an){ if(!canWrite()||!S.sel) return; S.type=an.dataset.addnote; openSheet("note"); return; }
     const b=e.target.closest("[data-act]"); if(!b) return;
     const act=b.dataset.act, id=b.dataset.id;
     if(act==="close"){ closeSheet(); return; }
