@@ -197,6 +197,11 @@ main{flex:1;padding-block:14px 120px;padding-left:max(16px,env(safe-area-inset-l
 .chk-hist .d{font-family:var(--title);color:var(--muted);margin-right:4px}
 .chk-hist .ok{color:var(--green)} .chk-hist .ng{color:var(--red)}
 .w-chk{order:-1}
+.chk-f{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.chk-cols{display:grid;gap:14px}
+@media (min-width:900px){ .chk-cols{grid-template-columns:1fr 1fr} .chk-cols>div+div{border-left:1px solid var(--line);padding-left:14px} }
+.chk-bh{font-family:var(--title);font-size:16px;display:flex;gap:6px;align-items:center;margin-bottom:2px}
+.chk-nm .pt{margin-right:0}
 .g-top .bseg button{white-space:nowrap;padding-inline:16px}
 .g-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:4px 0 8px}
 .g-leg{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:8px}
@@ -492,21 +497,22 @@ html,body{background:var(--page);margin:0}
     const t=today(), o=st.over, first=o[0]||st.now[0], lm=lastMiss(st);
     const days=o.length?Math.round((new Date(t)-new Date(o[0].date))/864e5):0;
     return `<div class="chk-row ${o.length?"over":""}">
-      <button class="chk-nm" data-gostu="${s.id}"><b>${esc(s.name)}</b><span class="chip b-${esc(s.branch)}">${esc(s.branch)}</span>${s.owner?`<span class="ochip ${oc(s.owner)}">${esc(s.owner)}</span>`:""}</button>
+      <button class="chk-nm" data-gostu="${s.id}">${ptag(s)}<b>${esc(s.name)}</b><span class="chip b-${esc(s.branch)}">${esc(s.branch)}</span>${s.owner?`<span class="ochip ${oc(s.owner)}">${esc(s.owner)}</span>`:""}</button>
       <div class="chk-info">${o.length?`<span class="chip c-warn">${fmt(o[0].date)}(${WD[wdIdx(o[0].date)]})${first.p?" "+esc(first.p):""}부터 ${days}일째${o.length+st.now.length>1?` · ${o.length+st.now.length}회 밀림`:""}</span>`:`<span class="chip c-dir">오늘${first.p?" "+esc(first.p):""}</span>`}
         ${lm?`<span class="chip c-mute" title="${esc(lm.memo||"")}">못 함: ${esc(lm.reason)}${lm.memo?" · "+esc(lm.memo.slice(0,24)):""}${nm(lm.createdBy)?" ("+esc(nm(lm.createdBy))+")":""}</span>`:""}</div>
       ${canWrite()?`<div class="chk-acts"><button class="mini ok" data-act="chk-done" data-id="${s.id}">점검 완료</button><button class="mini" data-act="chk-miss" data-id="${s.id}" data-date="${(o[o.length-1]||st.now[0]).date}">못 함</button></div>`:""}
     </div>`;
   }
-  function chkLists(){
-    const rows=S.students.filter(s=>s.active!==false).map(s=>({s,st:chkState(s)})).filter(x=>x.st.pending.length);
+  function chkLists(f){
+    const rows=S.students.filter(s=>s.active!==false&&(!f||f(s))).map(s=>({s,st:chkState(s)})).filter(x=>x.st.pending.length);
     const over=rows.filter(x=>x.st.over.length).sort((a,b)=>a.st.over[0].date.localeCompare(b.st.over[0].date)||a.s.name.localeCompare(b.s.name,"ko"));
     const now=rows.filter(x=>!x.st.over.length).sort((a,b)=>a.s.branch.localeCompare(b.s.branch)||(a.st.now[0].p||"").localeCompare(b.st.now[0].p||"")||a.s.name.localeCompare(b.s.name,"ko"));
     return {over,now};
   }
   const ownerSeg=(attr,cur,withNone=true)=>`<div class="fbar" style="margin:0">${(withNone?[""]:[]).concat(OWN).map(o=>`<button type="button" class="fchip ${oc(o)}" ${attr}="${o}" aria-pressed="${cur===o}">${o?`<span class="sw"></span>${o}`:"담당 없음"}</button>`).join("")}</div>`;
   try { const b=localStorage.getItem("jlog-tab"); if(["홈","캘린더","학생","매뉴얼"].includes(b)) S.tab=b;
-    const r=localStorage.getItem("jlog-branch"); if(r==="목동"||r==="사우") S.branch=r; } catch(e){}
+    const r=localStorage.getItem("jlog-branch"); if(r==="목동"||r==="사우") S.branch=r;
+    S.hBr=localStorage.getItem("jlog-hbr")||""; S.hProg=localStorage.getItem("jlog-hprog")||""; } catch(e){}
 
   const today=()=>{const d=new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());return d.toISOString().slice(0,10)};
   const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -778,13 +784,19 @@ html,body{background:var(--page);margin:0}
         :`<div class="w-empty">등록된 학생이 없습니다. 「학생 기록」에서 먼저 추가하세요.</div>`)
       :`<div class="sub">매뉴얼 항목은 상황·조치·근거를 함께 적어야 해서 입력창으로 엽니다.</div>
         <div class="qrow"><span style="flex:1"></span><button class="qsave" type="button" data-act="q-man">매뉴얼 항목 추가</button></div>`;
-    const CL=chkLists(), noSlot=S.students.filter(s=>s.active!==false&&s.program!=="프리미엄"&&!slotsOf(s).length).length;
+    const hf=s=>(!S.hBr||s.branch===S.hBr)&&(!S.hProg||(s.program||"")===S.hProg);
+    const CL=chkLists(hf), noSlot=S.students.filter(s=>s.active!==false&&s.program!=="프리미엄"&&!slotsOf(s).length&&hf(s)).length;
+    const chkBlock=(L,title)=>`${title?`<div class="chk-bh">${title}${L.over.length?` <span class="chip c-warn">밀림 ${L.over.length}</span>`:""} <span class="chip c-dir">오늘 ${L.now.length}</span></div>`:""}
+        ${L.over.length?`<div class="sub chk-sub">밀린 점검 — 완료할 때까지 매일 남습니다</div>${L.over.map(x=>chkRow(x.s,x.st)).join("")}`:""}
+        ${L.now.length?`<div class="sub chk-sub">오늘 점검</div>${L.now.map(x=>chkRow(x.s,x.st)).join("")}`:""}
+        ${!L.over.length&&!L.now.length?`<div class="w-empty">오늘 남은 점검이 없습니다.</div>`:""}`;
+    const split=(L,b)=>({over:L.over.filter(x=>x.s.branch===b),now:L.now.filter(x=>x.s.branch===b)});
     m.innerHTML=`${S.err?`<p class="status">${esc(S.err)}</p>`:""}<div class="dash">
       <section class="w w-chk"><div class="w-h"><h3>점검</h3>${CL.over.length?`<span class="chip c-warn">밀림 ${CL.over.length}명</span>`:""}<span class="chip c-dir">오늘 ${CL.now.length}명</span></div>
-        ${CL.over.length?`<div class="sub chk-sub">밀린 점검 — 완료할 때까지 매일 여기 남습니다</div>${CL.over.map(x=>chkRow(x.s,x.st)).join("")}`:""}
-        ${CL.now.length?`<div class="sub chk-sub">오늘 점검</div>${CL.now.map(x=>chkRow(x.s,x.st)).join("")}`:""}
-        ${!CL.over.length&&!CL.now.length?`<div class="w-empty">오늘 남은 점검이 없습니다.</div>`:""}
-        ${noSlot?`<div class="sub">점검 요일이 등록되지 않은 재원생 ${noSlot}명 — 학생 화면의 「점검 일정」에서 등록</div>`:""}
+        <div class="chk-f"><div class="vseg">${[["","전체"],["목동","목동점"],["사우","사우점"]].map(([v,l])=>`<button data-hbr="${v}" aria-pressed="${(S.hBr||"")===v}">${l}</button>`).join("")}</div>
+          <div class="fbar" style="margin:0">${[""].concat(PROGRAMS).map(x=>`<button class="fchip" data-hprog="${esc(x)}" aria-pressed="${(S.hProg||"")===x}">${x?`${`<i class="pt p-${esc(x)}">${esc(pLetter(x))}</i>`}${esc(x)}`:"프로그램 전체"}</button>`).join("")}</div></div>
+        ${S.hBr?chkBlock(CL,""):`<div class="chk-cols">${["목동","사우"].map(b=>`<div>${chkBlock(split(CL,b),b+"점")}</div>`).join("")}</div>`}
+        ${noSlot?`<div class="sub">점검 요일이 등록되지 않은 재원생 ${noSlot}명 (프리미엄 제외) — 캘린더 「점검표」에서 등록</div>`:""}
       </section>
       <section class="w w-alert"><div class="w-h"><h3>확인할 학생</h3><span class="chip c-dir">${alerts.length}명</span></div>
         ${alerts.length?`<div style="display:grid;gap:6px">${alerts.slice(0,8).map(a=>`<button class="al" data-gostu="${a.s.id}"><span class="nm">${esc(a.s.name)}</span>${a.s.program?`<span class="pchip p-${esc(a.s.program)}">${esc(a.s.program)}</span>`:""}<span class="chip b-${esc(a.s.branch)}">${esc(a.s.branch)}</span>${a.warn?`<span class="chip c-warn">경고 ${a.warn}</span>`:""}${a.open?`<span class="chip c-dir">확인 ${a.open}</span>`:""}</button>`).join("")}
@@ -1218,6 +1230,8 @@ html,body{background:var(--page);margin:0}
     if((v=pick("data-qowner"))!==null){ S.qowner=v; render(); return; }
     if((v=pick("data-calown"))!==null){ S.calOwn=v; render(); return; }
     if((v=pick("data-calview"))!==null){ S.calView=v; S.calPop=false; if(v!=="점검표") S.gEdit=false; render(); return; }
+    if((v=pick("data-hbr"))!==null){ S.hBr=v; try{localStorage.setItem("jlog-hbr",v)}catch(_){} render(); return; }
+    if((v=pick("data-hprog"))!==null){ S.hProg=v; try{localStorage.setItem("jlog-hprog",v)}catch(_){} render(); return; }
     if((v=pick("data-gbr"))!==null){ S.gBranch=v; render(); return; }
     if((v=pick("data-ownf"))!==null){ S.ownF=v; render(); return; }
     if((v=pick("data-progf"))!==null){ S.progF=v; render(); return; }
