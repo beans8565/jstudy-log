@@ -221,6 +221,7 @@ main{flex:1;padding-block:14px 120px;padding-left:max(16px,env(safe-area-inset-l
 .gpk{display:flex;align-items:center;gap:8px;background:var(--surface);border-radius:10px;padding:9px 12px;cursor:pointer}
 .gpk .nm{font-family:var(--title);font-size:15px}
 .gpk input{width:18px;height:18px}
+.gpk[hidden]{display:none}
 .app:not(.home) main{background:var(--bg)}
 .cal{background:var(--bg);border:1px solid var(--line);border-radius:14px;overflow:hidden}
 .cal .wh{border-bottom:1px solid var(--line)}
@@ -797,6 +798,10 @@ html,body{background:var(--page);margin:0}
 
   /* ---------- calendar ---------- */
   const pNum=x=>{const m=String(x&&x.p||"").match(/\d+/);return m?+m[0]:0};
+  function gpickFilter(){ const q=($("#gpick-q")?.value||"").trim(); const vis=[];
+    document.querySelectorAll("#gslotForm .gpk").forEach(l=>{ const on=l.querySelector("input").checked, show=!q||on||l.dataset.nm.includes(q); l.hidden=!show; if(show&&!on) vis.push(l); });
+    gpickCount(); return vis; }
+  function gpickCount(){ const n=document.querySelectorAll('#gslotForm input[name="gs"]:checked').length, b=$("#gpick-go"); if(b) b.textContent=n?`${n}명 추가`:"추가"; }
   function chkGrid(){
     const t=today(), br=S.gBranch||S.branch, mon=addDays(S.cal.d,-((wdIdx(S.cal.d)+6)%7)), days=[0,1,2,3,4,5,6].map(i=>addDays(mon,i));
     const studs=S.students.filter(s=>s.active!==false&&s.branch===br&&(!S.calOwn||(s.owner||"")===S.calOwn));
@@ -996,9 +1001,11 @@ html,body{background:var(--page);margin:0}
       const [d,n]=String(S.editId).split("|").map(Number), br=S.gBranch||S.branch;
       const cand=S.students.filter(s=>s.active!==false&&s.branch===br&&!slotsOf(s).some(x=>+x.d===d&&pNum(x)===n)).sort((a,b)=>a.name.localeCompare(b.name,"ko"));
       root.innerHTML=wrap("gslotForm",`<h2>${br}점 ${WD[d]}요일 ${n?n+"교시":"(교시 미정)"} 점검</h2>
-        <p class="hint">넣을 학생을 모두 체크하세요. 이미 다른 요일에 점검이 있는 학생은 옆에 표시됩니다.</p>
-        <div class="gpick">${cand.map(s=>`<label class="gpk"><input type="checkbox" name="gs" value="${s.id}"><span class="nm">${esc(s.name)}</span>${s.program?`<span class="pchip p-${esc(s.program)}">${esc(s.program)}</span>`:""}${slotsOf(s).length?`<span class="sub" style="margin:0">${esc(slotsOf(s).map(slotLabel).join(", "))}</span>`:""}</label>`).join("")||'<div class="sub">넣을 수 있는 학생이 없습니다.</div>'}</div>
-        <button class="save" type="submit">추가</button>`);
+        <input class="search" id="gpick-q" type="text" placeholder="이름 검색 (Enter: 하나만 남으면 바로 체크)" autocomplete="off" style="margin:0">
+        <p class="hint">체크한 학생은 검색해도 목록에 남습니다. 이미 다른 요일에 점검이 있는 학생은 옆에 표시됩니다.</p>
+        <div class="gpick">${cand.map(s=>`<label class="gpk" data-nm="${esc(s.name)}"><input type="checkbox" name="gs" value="${s.id}"><span class="nm">${esc(s.name)}</span>${s.program?`<span class="pchip p-${esc(s.program)}">${esc(s.program)}</span>`:""}${slotsOf(s).length?`<span class="sub" style="margin:0">${esc(slotsOf(s).map(slotLabel).join(", "))}</span>`:""}</label>`).join("")||'<div class="sub">넣을 수 있는 학생이 없습니다.</div>'}</div>
+        <button class="save" type="submit" id="gpick-go">추가</button>`);
+      setTimeout(()=>$("#gpick-q")?.focus(),50);
     } else if(S.sheet==="miss"){
       const [sid,dd]=String(S.editId).split("|"), s=S.students.find(x=>x.id===sid);
       root.innerHTML=wrap("missForm",`<h2>${esc(s?.name||"")} 점검 못 함</h2>
@@ -1118,6 +1125,8 @@ html,body{background:var(--page);margin:0}
 
   /* ---------- events ---------- */
   document.addEventListener("input",e=>{
+    if(e.target.id==="gpick-q"){ gpickFilter(); return; }
+    if(e.target.closest&&e.target.closest("#gslotForm")&&e.target.name==="gs"){ gpickCount(); }
     if(e.target.id==="search"){ S.search=e.target.value; $("#stuItems").innerHTML=stuItems(); }
     if(e.target.id==="calq"){ S.calQ=e.target.value; render(); return; }
     if(e.target.id==="dsearch"){ S.dq=e.target.value; $("#dResults").innerHTML=dManResults(); }
@@ -1134,6 +1143,7 @@ html,body{background:var(--page);margin:0}
     if(id==="nperiod"){ S.nPeriod=e.target.value; render(); }
   });
   document.addEventListener("keydown",e=>{ if(e.key==="Enter"&&e.target.classList?.contains("wcol")) e.target.click();
+    if(e.key==="Enter"&&e.target.id==="gpick-q"){ e.preventDefault(); const vis=gpickFilter(); if(vis.length===1){ vis[0].querySelector("input").checked=true; e.target.value=""; gpickFilter(); } else if(!e.target.value.trim()&&document.querySelector('#gslotForm input[name="gs"]:checked')) $("#gpick-go").click(); }
     if(e.key==="Escape"&&S.calPop&&!S.sheet){ S.calPop=false; render(); }
     if((e.ctrlKey||e.metaKey)&&(e.key==="k"||e.key==="K")&&isCal()&&canWrite()&&!S.sheet){ e.preventDefault(); S.branchPick="공통"; S.ownerPick=S.calOwn||""; openSheet("event"); } });
   addEventListener("resize",()=>{ if(S.calPop) placePop(); });
