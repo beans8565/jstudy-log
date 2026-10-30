@@ -197,6 +197,36 @@ main{flex:1;padding-block:14px 120px;padding-left:max(16px,env(safe-area-inset-l
 .chk-hist .d{font-family:var(--title);color:var(--muted);margin-right:4px}
 .chk-hist .ok{color:var(--green)} .chk-hist .ng{color:var(--red)}
 .w-chk{order:-1}
+.w-ntc{order:-3}.w-task{order:-2}
+.ntc{display:flex;gap:6px;align-items:center;font-size:14px;cursor:pointer}
+.ntc-chip{background:var(--pink-soft);color:var(--pink);border-radius:6px;padding:0 6px}
+.ntc-list{display:grid;gap:6px}
+.ntc-row{display:flex;flex-wrap:wrap;gap:8px 10px;align-items:flex-start;background:var(--amber-bg);border-radius:12px;padding:10px 12px}
+.ntc-row.exp{background:var(--surface);box-shadow:inset 3px 0 0 var(--red)}
+.ntc-who{border:0;background:var(--bg);border-radius:8px;padding:3px 9px;font-family:var(--title);font-size:14px;cursor:pointer;white-space:nowrap;color:var(--fg)}
+.ntc-who.com{cursor:default;color:var(--amber)}
+.ntc-tx{flex:1 1 220px;min-width:0;white-space:pre-wrap;font-size:14px;line-height:1.55}
+.ntc-side{margin-left:auto;display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+.addrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center}
+.addrow .field{flex:1;min-width:180px}
+.tk{display:flex;align-items:flex-start;gap:10px;background:var(--surface);border-radius:12px;padding:10px 12px;margin-top:6px}
+.tk.carry{background:var(--amber-bg)} .tk.esc{background:var(--red-bg);box-shadow:inset 3px 0 0 var(--red)}
+.tk.done{opacity:.6} .tk.done .tk-tt{text-decoration:line-through}
+.tk-ck{width:24px;height:24px;border-radius:50%;border:2px solid #9aa0aa;background:var(--bg);flex:0 0 auto;display:grid;place-items:center;cursor:pointer;padding:0;margin-top:1px}
+.tk.done .tk-ck{background:var(--check);border-color:var(--check)}
+.tk-ck svg{width:14px;height:14px}
+.tk-bd{flex:1;min-width:0}.tk-tt{font-size:15px;word-break:break-word}
+.tk-meta{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px;align-items:center;font-size:12px;color:var(--muted)}
+.tk-meta .chip{border:0;cursor:pointer}
+.mk{font-family:var(--title);font-size:12px;border-radius:6px;padding:1px 6px}
+.mk.r{background:var(--red);color:#fff}.mk.a{background:var(--amber);color:#fff}.mk.b{background:var(--blue-bg);color:var(--blue)}
+.tk-sec{font-family:var(--title);font-size:14px;margin:12px 0 0;display:flex;gap:6px;align-items:center}
+.tk-sec.r{color:var(--red)}.tk-sec.a{color:var(--amber)}
+.tk-asg{padding:3px 6px;font-size:12px}
+.tk-rep,.tk-done{margin-top:10px}
+.tk-rep summary,.tk-done summary{cursor:pointer;font-family:var(--title);font-size:13px;color:var(--muted)}
+.rep-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:6px 0;border-bottom:1px solid var(--line)}
+.rep-days{display:flex;gap:4px;flex-wrap:wrap}.rep-days label{display:flex;align-items:center;gap:2px;font-size:13px}
 .chk-f{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 .chk-cols{display:grid;gap:14px}
 @media (min-width:900px){ .chk-cols{grid-template-columns:1fr 1fr} .chk-cols>div+div{border-left:1px solid var(--line);padding-left:14px} }
@@ -332,14 +362,14 @@ main{flex:1;padding-block:14px 120px;padding-left:max(16px,env(safe-area-inset-l
   .app.calv main{max-width:1240px}
   .app:not(.home) .top{background:var(--bar)}
   .app.home .top{background:var(--bar)}
-  .dash{grid-template-columns:repeat(3,minmax(0,1fr));grid-template-areas:"chk chk chk" "cal alert quick" "cal up man"}
-  .w-chk{grid-area:chk}
+  .dash{grid-template-columns:repeat(3,minmax(0,1fr));grid-template-areas:"ntc ntc ntc" "task task task" "chk chk chk" "cal alert quick" "cal up man"}
+  .w-chk{grid-area:chk}.w-ntc{grid-area:ntc}.w-task{grid-area:task}
   .w-cal{grid-area:cal}.w-alert{grid-area:alert}.w-quick{grid-area:quick}.w-up{grid-area:up}.w-man{grid-area:man}
   .mc{min-height:62px}
   .toast{bottom:28px}
 }
 @media (min-width:900px) and (max-width:1180px){
-  .dash{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-areas:"chk chk" "alert quick" "up cal" "man cal"}
+  .dash{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-areas:"ntc ntc" "task task" "chk chk" "alert quick" "up cal" "man cal"}
 }
 /* tab bar */
 .tabbar{position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--bar);border-top:1px solid var(--line);
@@ -430,7 +460,7 @@ html,body{background:var(--page);margin:0}
   const S = { db:null, tab:"홈", branch:"목동", qtype:"일정", q:{}, qnt:"학습방향", qbranch:"공통", dq:"", students:[], notes:[], chapters:[], manual:[], sel:null, search:"", showArch:false,
     ready:false, canEdit:true, isOwner:false, staff:true, uid:null, user:null, names:{}, readonly:false, sheet:null, sheetKey:"", type:"학습방향", confirmDel:null, err:"",
     m:{kind:"home", id:null}, mq:"", editId:null, showHist:false, branchPick:"공통",
-    events:[], changelog:[], checks:[], cal:{y:0,m:0,d:""}, slotD:"1", slotN:"1", gBranch:"", gEdit:false,
+    events:[], changelog:[], checks:[], tasks:[], repeats:[], cal:{y:0,m:0,d:""}, slotD:"1", slotN:"1", gBranch:"", gEdit:false,
     wk:1, fs:"보통", ownerPick:"", qowner:"", calOwn:"", calView:"월", calQ:"", ownF:"", lsort:"이름", progF:"", nSort:"최신", nType:"", nPeriod:"전체" };
   const PAL=["#2F6FC4","#2E8A4A","#6E4CC4","#C98A16","#D9466F","#0F8C8C","#8A5A3B","#6B7280"];
   let OWNERS=[{name:"한승종",color:"#2F6FC4"},{name:"강한빛",color:"#2E8A4A"}];
@@ -467,12 +497,51 @@ html,body{background:var(--page);margin:0}
   function renderAlerts(){
     const a=activeAlerts(), el=$("#alerts");
     const ov=S.staff?chkLists().over:[];
+    const tke=S.staff?taskLists(()=>true).esc:[];
+    const ban2=tke.length&&!isHome()?`<div class="alerts"><div class="alc over chk-ban"><span class="bell" aria-hidden="true">⚠</span><button class="tx" data-tabgo="홈"><b>실장 확인 필요 ${tke.length}건</b> — 2근무일째 처리되지 않은 인수인계 (${esc(tke.slice(0,3).map(o=>o.x.title.slice(0,18)).join(" / "))})<div class="sub">담당을 지정하기 전까지 계속 표시됩니다</div></button></div></div>`:"";
     const ban=ov.length&&!isHome()?`<div class="alerts"><div class="alc over chk-ban"><span class="bell" aria-hidden="true">⚠</span><button class="tx" data-tabgo="홈"><b>밀린 점검 ${ov.length}명</b> — ${esc(ov.slice(0,5).map(x=>x.s.name).join(", "))}${ov.length>5?" 외":""}<div class="sub">점검 완료를 누르기 전까지 모든 사람 화면에 계속 표시됩니다</div></button></div></div>`:"";
-    el.innerHTML=ban+(a.length?`<div class="alerts">${a.map(x=>`<div class="alc ${x.over?"over":""}"><span class="bell" aria-hidden="true">🔔</span>
+    el.innerHTML=ban2+ban+(a.length?`<div class="alerts">${a.map(x=>`<div class="alc ${x.over?"over":""}"><span class="bell" aria-hidden="true">🔔</span>
       <button class="tx" ${x.kind==="ev"?`data-gocal="${x.when}"`:`data-gostu="${x.stu}"`}><b>${esc(x.title)}</b><div class="sub">${esc(x.sub)}</div></button>
       ${x.owner?`<span class="ochip ${oc(x.owner)}">${esc(x.owner)}</span>`:""}
       ${canWrite()?`<button class="mini" data-act="al-ack" data-kind="${x.kind}" data-id="${x.id}">확인</button>`:""}</div>`).join("")}</div>`:"");
   }
+  /* ---------- 고정 관리 사항 · 인수인계 할 일 ---------- */
+  const stuName=id=>{const s=id&&S.students.find(x=>x.id===id);return s?s.name:"";};
+  function noticeList(f){ const t=today();
+    return S.notes.filter(n=>n.notice&&n.pinned&&(!n.studentId||S.students.some(s=>s.id===n.studentId&&s.active!==false))&&f(n.branch))
+      .map(n=>({n,exp:!!(n.until&&n.until<t)})).sort((a,b)=>(a.n.studentId?1:0)-(b.n.studentId?1:0)||(stuName(a.n.studentId)).localeCompare(stuName(b.n.studentId),"ko")||(a.n.createdAt||"").localeCompare(b.n.createdAt||"")); }
+  function workDays(branch){ const set=new Set([today()]);
+    S.tasks.forEach(x=>{ if(x.branch===branch){ if(x.createdAt) set.add(isoDay(x.createdAt)); if(x.doneAt) set.add(isoDay(x.doneAt)); } });
+    S.checks.forEach(c=>{ if(c.branch===branch&&c.doneDate) set.add(c.doneDate); });
+    S.notes.forEach(n=>{ if(n.branch===branch&&n.date) set.add(n.date); });
+    return set; }
+  const isoDay=ts=>{const d=new Date(ts);d.setMinutes(d.getMinutes()-d.getTimezoneOffset());return d.toISOString().slice(0,10)};
+  function taskAge(x,wd){ let n=0; wd.forEach(d=>{ if(d>x.dueDate&&d<=today()) n++; }); return n; }
+  function taskLists(f){ const t=today(), wdc={};
+    const sup=x=>x.repeatId&&S.tasks.some(y=>y.repeatId===x.repeatId&&y.dueDate>x.dueDate&&y.dueDate<=t);
+    const open=S.tasks.filter(x=>!x.done&&f(x.branch)&&x.dueDate<=t&&!sup(x)).map(x=>{ const wd=wdc[x.branch]||(wdc[x.branch]=workDays(x.branch)); return {x,age:taskAge(x,wd)}; });
+    const esc_=open.filter(o=>o.age>=2&&!o.x.assignee), carry=open.filter(o=>o.age>=1&&!(o.age>=2&&!o.x.assignee)), now=open.filter(o=>o.age===0);
+    const done=S.tasks.filter(x=>x.done&&f(x.branch)&&x.doneAt&&isoDay(x.doneAt)===t);
+    const srt=(a,b)=>a.x.dueDate.localeCompare(b.x.dueDate)||(a.x.createdAt||"").localeCompare(b.x.createdAt||"");
+    return {esc:esc_.sort(srt),carry:carry.sort(srt),now:now.sort((a,b)=>(a.x.repeatId?1:0)-(b.x.repeatId?1:0)||srt(a,b)),done}; }
+  let repBusy=false;
+  async function ensureRepeats(){ if(repBusy||!S.db||!canWrite()) return; const t=today(), w=wdIdx(t);
+    const need=S.repeats.filter(r=>r.active!==false&&(r.days||[]).map(Number).includes(w)&&!S.tasks.some(x=>x.repeatId===r.id&&x.dueDate===t));
+    if(!need.length) return; repBusy=true;
+    for(const r of need){ try{ await S.db.collection("tasks").add({branch:r.branch,title:r.title,dueDate:t,repeatId:r.id,createdBy:S.uid||"",createdAt:new Date().toISOString()}); }catch(_){ } }
+    repBusy=false; }
+  function taskRow(o){ const x=o.x, cw=canWrite(), sn=stuName(x.studentId);
+    const cls=x.done?"done":o.age>=2&&!x.assignee?"esc":o.age>=1?"carry":"";
+    return `<div class="tk ${cls}"><button class="tk-ck" data-act="tk-done" data-id="${x.id}" ${cw?"":"disabled"} aria-label="${x.done?"완료 취소":"완료"}">${x.done?CHECK:""}</button>
+      <div class="tk-bd"><div class="tk-tt">${esc(x.title)}</div>
+        <div class="tk-meta">${o.age>=2&&!x.assignee&&!x.done?`<span class="mk r">${o.age}일째</span>`:o.age>=1&&!x.done?`<span class="mk a">${o.age}일째 이월</span>`:""}
+          ${x.repeatId?'<span class="mk b">반복</span>':""}${sn?`<button class="chip c-mute" data-gostu="${x.studentId}">${esc(sn)}</button>`:""}
+          ${x.assignee?`<span class="ochip ${oc(x.assignee)}">담당 ${esc(x.assignee)}</span>`:""}
+          ${x.carryNote&&!x.done?`<span class="chip c-mute">못 함: ${esc(x.carryNote)}</span>`:""}
+          <span>${x.done?`완료 ${esc(nm(x.doneBy))} ${x.doneAt?new Date(x.doneAt).toTimeString().slice(0,5):""}`:`${fmt(x.dueDate)} ${esc(nm(x.createdBy))}${x.repeatId?"":" 등록"}`}</span>
+          ${cw&&!x.done?`<button class="mini" data-act="tk-miss" data-id="${x.id}">못 함</button>`:""}
+          ${cw&&!x.done&&o.age>=2?`<select class="sel tk-asg" data-id="${x.id}" aria-label="담당 지정"><option value="">담당 지정…</option>${OWN.map(w=>`<option ${x.assignee===w?"selected":""}>${esc(w)}</option>`).join("")}</select>`:""}
+          ${cw&&!x.repeatId?`<button class="link-btn" data-act="tk-del" data-id="${x.id}">삭제</button>`:""}</div></div></div>`; }
   /* ---------- 점검 일정·누락 ---------- */
   const WD="일월화수목금토";
   const slotsOf=s=>Array.isArray(s&&s.checkSlots)?s.checkSlots.filter(x=>x&&x.d!==undefined&&x.d!==""):[];
@@ -538,7 +607,7 @@ html,body{background:var(--page);margin:0}
   function resolveNames(){
     if(!S.uid) return; const ids=new Set();
     S.notes.forEach(n=>{n.createdBy&&ids.add(n.createdBy);n.checkedBy&&ids.add(n.checkedBy);n.editedBy&&ids.add(n.editedBy)});
-    S.events.forEach(e=>e.createdBy&&ids.add(e.createdBy)); S.checks.forEach(c=>c.createdBy&&ids.add(c.createdBy)); S.manual.forEach(x=>x.updatedBy&&ids.add(x.updatedBy)); S.changelog.forEach(c=>c.by&&ids.add(c.by));
+    S.events.forEach(e=>e.createdBy&&ids.add(e.createdBy)); S.checks.forEach(c=>c.createdBy&&ids.add(c.createdBy)); S.tasks.forEach(x=>{x.createdBy&&ids.add(x.createdBy);x.doneBy&&ids.add(x.doneBy)}); S.manual.forEach(x=>x.updatedBy&&ids.add(x.updatedBy)); S.changelog.forEach(c=>c.by&&ids.add(c.by));
     const miss=[...ids].filter(i=>!(i in S.names)); if(!miss.length) return;
     miss.forEach(i=>S.names[i]="");
     clearTimeout(nameT); nameT=setTimeout(async()=>{ try{ for(let k=0;k<miss.length;k+=64){ const part=miss.slice(k,k+64); const {data:pd}=await JDB.sb.from("profiles").select("id,name").in("id",part); const ps={}; (pd||[]).forEach(p=>ps[p.id]={name:p.name}); part.forEach(i=>{S.names[i]=(ps&&ps[i]&&ps[i].name)||"이름 미확인"}); } }catch(_){} render(); },60);
@@ -681,7 +750,7 @@ html,body{background:var(--page);margin:0}
       <div class="sec">📌 고정 유지사항 <span class="n">${pinned.length}</span></div>
       ${pinned.length?`<div class="pins">${pinned.map(n=>`
         <div class="pin-card ${n.type==="경고"?"warn":n.type==="학습방향"?"dir":""}">
-          <div class="txt"><div class="when">${fmt(n.date)} · ${esc(n.type)}${n.alertDate?` · 🔔 ${fmt(n.alertDate)}`:""}</div>${esc(n.content)}${n.nextStep?`<div class="sub next">재발 시: ${esc(n.nextStep)}</div>`:""}${ruleOf(n.ruleId)?`<div style="margin-top:4px">${ruleChip(n)}</div>`:""}</div>
+          <div class="txt"><div class="when">${fmt(n.date)} · ${esc(n.type)}${n.alertDate?` · 🔔 ${fmt(n.alertDate)}`:""}${n.notice?` · <span class="ntc-chip">📢 근무자 공지${n.until?` ~${fmt(n.until)}`:""}</span>`:""}</div>${esc(n.content)}${n.nextStep?`<div class="sub next">재발 시: ${esc(n.nextStep)}</div>`:""}${ruleOf(n.ruleId)?`<div style="margin-top:4px">${ruleChip(n)}</div>`:""}</div>
           ${canWrite()?`<div style="display:flex;flex-direction:column;gap:6px"><button class="mini" data-act="n-edit" data-id="${n.id}">수정</button><button class="mini" data-act="unpin" data-id="${n.id}">해제</button></div>`:""}
         </div>`).join("")}</div>`
         :`<div class="sub">고정된 항목이 없습니다. 계속 기억해야 할 내용은 위의 「+ 유지사항」으로 남기세요.</div>`}
@@ -717,6 +786,7 @@ html,body{background:var(--page);margin:0}
         "학생 기록":[...S.notes].sort((a,b)=>a.date.localeCompare(b.date)).map(n=>({날짜:n.date,학생:sn(n.studentId),지점:n.branch,유형:n.type,내용:n.content,재발시조치:n.nextStep||"",이행:n.check||"",체크일:n.checkedAt||"",체크한사람:nm(n.checkedBy),고정:n.pinned?"O":"",알림날짜:n.alertDate||"",적용규정:ruleOf(n.ruleId)?.title||"",작성자:nm(n.createdBy)})),
         "일정":[...S.events].sort((a,b)=>a.date.localeCompare(b.date)).map(e=>({날짜:e.date,시간:e.time||"",내용:e.title,지점:e.branch||"",담당:e.owner||"",완료:e.done?"O":"",알림:(e.alertDays===0||e.alertDays>0)?(e.alertDays?e.alertDays+"일 전":"당일"):"",작성자:nm(e.createdBy)})),
         "매뉴얼":[...S.manual].sort((a,b)=>chNo(a.chapterId).localeCompare(chNo(b.chapterId))||a.title.localeCompare(b.title,"ko")).map(x=>({목차:chNo(x.chapterId)+" "+chName(x.chapterId),제목:x.title,상황:x.situation||"",조치:x.action,적용지점:x.branch||"공통",근거:x.source||"",최종수정:(x.updatedAt||"").slice(0,10),수정자:nm(x.updatedBy)})),
+        "인수인계":[...S.tasks].sort((a,b)=>(a.createdAt||"").localeCompare(b.createdAt||"")).map(x=>({날짜:x.dueDate,지점:x.branch,할일:x.title,학생:sn(x.studentId),완료:x.done?"O":"",완료자:nm(x.doneBy),완료시각:x.doneAt?String(x.doneAt).slice(0,16).replace("T"," "):"",못한사유:x.carryNote||"",담당지정:x.assignee||"",등록자:nm(x.createdBy)})),
         "점검":[...S.checks].sort((a,b)=>(a.createdAt||"").localeCompare(b.createdAt||"")).map(c=>({처리일:c.doneDate,점검예정일:c.dueDate,학생:sn(c.studentId),지점:c.branch,결과:c.status==="완료"?"완료":"못 함",사유:c.reason||"",메모:c.memo||"",처리자:nm(c.createdBy)})),
         "업데이트 내역":[...S.changelog].sort((a,b)=>(a.at||"").localeCompare(b.at||"")).map(c=>({날짜:c.date,구분:c.kind,제목:c.title,목차:c.chapter,내용:c.why||"",작성자:nm(c.by)})),
         "담당자":OWNERS.map(o=>({이름:o.name,색:o.color}))
@@ -791,7 +861,33 @@ html,body{background:var(--page);margin:0}
         ${L.now.length?`<div class="sub chk-sub">오늘 점검</div>${L.now.map(x=>chkRow(x.s,x.st)).join("")}`:""}
         ${!L.over.length&&!L.now.length?`<div class="w-empty">오늘 남은 점검이 없습니다.</div>`:""}`;
     const split=(L,b)=>({over:L.over.filter(x=>x.s.branch===b),now:L.now.filter(x=>x.s.branch===b)});
+    const bf=b=>!S.hBr||b===S.hBr||b==="공통";
+    const NL=noticeList(bf), TL=taskLists(b=>!S.hBr||b===S.hBr);
+    const brOpts=`${["목동","사우"].map(b=>`<option value="${b}" ${(S.hBr||S.branch)===b?"selected":""}>${b}점</option>`).join("")}`;
+    const stuOpts=b=>S.students.filter(s=>s.active!==false&&(!b||s.branch===b)).sort((a,c)=>a.name.localeCompare(c.name,"ko")).map(s=>`<option value="${s.id}">${esc(s.name)}${b?"":" ("+s.branch+")"}</option>`).join("");
+    ensureRepeats();
     m.innerHTML=`${S.err?`<p class="status">${esc(S.err)}</p>`:""}<div class="dash">
+      <section class="w w-ntc"><div class="w-h"><h3>📢 고정 관리 사항</h3><span class="chip c-keep">${NL.length}건</span><span class="sub" style="margin:0">${S.hBr?S.hBr+"점 + 공통":"전 지점"}</span></div>
+        ${NL.length?`<div class="ntc-list">${NL.map(({n,exp})=>{const sn=stuName(n.studentId);return `<div class="ntc-row ${exp?"exp":""}">
+          ${sn?`<button class="ntc-who" data-gostu="${n.studentId}">${esc(sn)}</button>`:`<span class="ntc-who com">${n.branch==="공통"?"공통":esc(n.branch)+"점"}</span>`}
+          <div class="ntc-tx">${esc(n.content)}</div>
+          <div class="ntc-side">${n.until?`<span class="chip ${exp?"c-warn":"c-mute"}">${exp?"종료일 지남 · 해제 확인":"~"+fmt(n.until)}</span>`:""}${canWrite()?`<button class="mini" data-act="ntc-off" data-id="${n.id}">해제</button>`:""}</div></div>`}).join("")}</div>`
+          :`<div class="w-empty">근무자 전원이 지켜야 할 규칙이 없습니다.</div>`}
+        ${canWrite()?`<form id="ntcForm" class="addrow"><input class="field" id="ntc-tx" placeholder="공통 규칙 추가 (예: 기침하는 학생은 마스크 착용 지시)" autocomplete="off"><select class="sel" id="ntc-br"><option value="공통" selected>공통</option><option value="목동">목동점</option><option value="사우">사우점</option></select><input class="field" id="ntc-until" type="date" title="종료일 (선택)" style="max-width:160px"><button class="qsave" type="submit">추가</button></form>
+          <p class="hint" style="margin-top:6px">학생별 규칙은 학생 화면 「+ 유지사항」에서 「📢 근무자 공지」를 체크하면 여기에 함께 뜹니다.</p>`:""}
+      </section>
+      <section class="w w-task"><div class="w-h"><h3>인수인계 할 일</h3>${TL.esc.length?`<span class="chip c-warn">확인 필요 ${TL.esc.length}</span>`:""}${TL.carry.length?`<span class="chip c-keep">이월 ${TL.carry.length}</span>`:""}<span class="chip c-dir">오늘 ${TL.now.length}</span></div>
+        ${TL.esc.length?`<div class="tk-sec r">⚠ 실장 확인 필요 <span class="sub" style="margin:0">— 2근무일째 미완료, 담당을 지정하세요</span></div>${TL.esc.map(taskRow).join("")}`:""}
+        ${TL.carry.length?`<div class="tk-sec a">↪ 이전 근무에서 넘어온 일</div>${TL.carry.map(taskRow).join("")}`:""}
+        ${TL.now.length?`<div class="tk-sec">오늘 할 일</div>${TL.now.map(taskRow).join("")}`:""}
+        ${!TL.esc.length&&!TL.carry.length&&!TL.now.length?`<div class="w-empty">남은 인수인계가 없습니다.</div>`:""}
+        ${canWrite()?`<form id="tkForm" class="addrow"><input class="field" id="tk-tx" placeholder="할 일 추가 (예: 장민서 일정 변동 문자 전송)" autocomplete="off"><select class="sel" id="tk-br">${brOpts}</select><select class="sel" id="tk-stu"><option value="">학생 연결 (선택)</option>${stuOpts(S.hBr)}</select><button class="qsave" type="submit">추가</button></form>
+          <details class="tk-rep"><summary>반복 업무 ${S.repeats.filter(r=>r.active!==false&&(!S.hBr||r.branch===S.hBr)).length}개 (영단어 채점·분리수거 등)</summary>
+            ${S.repeats.filter(r=>r.active!==false&&(!S.hBr||r.branch===S.hBr)).map(r=>`<div class="rep-row"><span class="chip b-${esc(r.branch)}">${esc(r.branch)}</span><b>${esc(r.title)}</b><span class="sub" style="margin:0">${(r.days||[]).length===7?"매일":[1,2,3,4,5,6,0].filter(d=>(r.days||[]).map(Number).includes(d)).map(d=>WD[d]).join("·")}</span><button class="link-btn" data-act="rep-del" data-id="${r.id}">삭제</button></div>`).join("")||'<div class="sub">등록된 반복 업무가 없습니다.</div>'}
+            <form id="repForm" class="addrow"><input class="field" id="rep-tx" placeholder="반복 업무 (예: 영단어 채점)" autocomplete="off"><select class="sel" id="rep-br">${brOpts}</select>
+              <span class="rep-days">${[1,2,3,4,5,6,0].map(d=>`<label><input type="checkbox" name="rd" value="${d}" checked>${WD[d]}</label>`).join("")}</span><button class="qsave" type="submit">추가</button></form></details>`:""}
+        ${TL.done.length?`<details class="tk-done"><summary>오늘 완료 ${TL.done.length}건</summary>${TL.done.map(x=>taskRow({x,age:0})).join("")}</details>`:""}
+      </section>
       <section class="w w-chk"><div class="w-h"><h3>점검</h3>${CL.over.length?`<span class="chip c-warn">밀림 ${CL.over.length}명</span>`:""}<span class="chip c-dir">오늘 ${CL.now.length}명</span></div>
         <div class="chk-f"><div class="vseg">${[["","전체"],["목동","목동점"],["사우","사우점"]].map(([v,l])=>`<button data-hbr="${v}" aria-pressed="${(S.hBr||"")===v}">${l}</button>`).join("")}</div>
           <div class="fbar" style="margin:0">${[""].concat(PROGRAMS).map(x=>`<button class="fchip" data-hprog="${esc(x)}" aria-pressed="${(S.hProg||"")===x}">${x?`${`<i class="pt p-${esc(x)}">${esc(pLetter(x))}</i>`}${esc(x)}`:"프로그램 전체"}</button>`).join("")}</div></div>
@@ -1058,12 +1154,19 @@ html,body{background:var(--page);margin:0}
     const keep=id=>document.getElementById(id)?.value;
     const prev={content:keep("sh-content"),date:keep("sh-date"),next:keep("sh-next"),
       title:keep("mt-title"),sit:keep("mt-sit"),act:keep("mt-act"),src:keep("mt-src"),ch:keep("mt-ch"),newch:keep("mt-newch"),why:keep("mt-why"),
-      evt:keep("ev-title"),evd:keep("ev-date"),evtm:keep("ev-time"),nm:keep("sh-name"),eal:keep("ev-alert"),nal:keep("sh-alert"),rule:keep("sh-rule"),imp:keep("imp-text"),own:keep("own-new"),prog:keep("prog-new")};
+      evt:keep("ev-title"),evd:keep("ev-date"),evtm:keep("ev-time"),nm:keep("sh-name"),eal:keep("ev-alert"),nal:keep("sh-alert"),rule:keep("sh-rule"),imp:keep("imp-text"),own:keep("own-new"),prog:keep("prog-new"),until:keep("sh-until")};
+    if(document.getElementById("sh-notice")) S.noticeChk=document.getElementById("sh-notice").checked;
     const reopen=S.sheetKey.split("|")[0]===S.sheet && S.sheetKey.split("|")[2]===String(S.editId);
     S.sheetKey=key;
     const wrap=(id,inner)=>`<div class="sheet-bg" data-act="close"></div><form class="sheet" id="${id}"><div class="sheet-in"><div class="grab"></div>${inner}
       <button class="cancel" type="button" data-act="close">닫기</button></div></form>`;
-    if(S.sheet==="gslot"){
+    if(S.sheet==="tkmiss"){
+      const x=S.tasks.find(t=>t.id===S.editId);
+      root.innerHTML=wrap("tkmissForm",`<h2>못 한 이유</h2><p class="hint">「${esc(x?.title||"")}」 — 사유를 남겨도 완료 전까지 다음 근무자에게 계속 넘어갑니다.</p>
+        <input class="field" id="tkm-tx" type="text" placeholder="예: 프린터 토너 부족 / 학생 미등원 / 시간 부족" value="${esc(x?.carryNote||"")}" autocomplete="off">
+        <button class="save" type="submit">저장</button>`);
+      setTimeout(()=>$("#tkm-tx")?.focus(),50);
+    } else if(S.sheet==="gslot"){
       const [d,n]=String(S.editId).split("|").map(Number), br=S.gBranch||S.branch;
       const cand=S.students.filter(s=>s.active!==false&&s.branch===br&&!slotsOf(s).some(x=>+x.d===d&&pNum(x)===n)).sort((a,b)=>(slotsOf(a).length?1:0)-(slotsOf(b).length?1:0)||a.name.localeCompare(b.name,"ko"));
       const nAssigned=cand.filter(s=>slotsOf(s).length||s.program==="프리미엄").length;
@@ -1133,6 +1236,8 @@ html,body{background:var(--page);margin:0}
         <textarea class="field" id="sh-content" placeholder="${t==="경고"?"예: 지각 건으로 경고 조치":t==="유지사항"?"예: 사회는 겨울방학부터 시작하기로 함":"예: 사문 오답, 생윤 마더텅 마무리"}">${esc(prev.content??ex?.content??"")}</textarea>
         ${t==="경고"?`<input class="field" id="sh-next" type="text" placeholder="재발 시 조치 (예: 다음 주 지각 시 그 다음 주 퇴소)" value="${esc(prev.next??ex?.nextStep??"")}">`:""}
         <p class="hint">${t==="유지사항"?"저장하면 맨 위에 고정됩니다. 필요 없어지면 「해제」를 누르세요.":"다음 계획표 작성 때 「이번에 확인할 항목」에 나옵니다."}</p>
+        ${t==="유지사항"?`<label class="ntc"><input type="checkbox" id="sh-notice" ${(S.noticeChk??ex?.notice)?"checked":""}> <b>📢 근무자 공지</b> — 홈 「고정 관리 사항」에 띄워 그날 근무자 전원이 보게 함</label>
+        <div class="qrow"><span class="sub" style="margin:0">종료일 (선택)</span><input class="field" id="sh-until" type="date" value="${esc(prev.until??ex?.until??"")}" style="max-width:200px"><span class="sub" style="margin:0">지나면 「해제 확인」 표시</span></div>`:""}
         <input class="field" id="sh-date" type="date" value="${esc(prev.date||ex?.date||today())}" aria-label="날짜">
         <p class="lbl">📘 적용 규정 (선택)</p>
         <select class="field" id="sh-rule" aria-label="적용 규정"><option value="">선택 안 함</option>${chOrder().map(c=>{const it=S.manual.filter(x=>x.chapterId===c.id).sort((a,b)=>a.title.localeCompare(b.title,"ko"));return it.length?`<optgroup label="${esc(c.name)}">${it.map(x=>`<option value="${x.id}" ${(prev.rule??ex?.ruleId??"")===x.id?"selected":""}>${esc(x.title)}</option>`).join("")}</optgroup>`:""}).join("")}</select>
@@ -1187,7 +1292,7 @@ html,body{background:var(--page);margin:0}
       if(!reopen) setTimeout(()=>(x?$("#mt-act"):$("#mt-title"))?.focus(),50);
     }
   }
-  function openSheet(kind,editId=null){ S.sheet=kind; S.editId=editId; S.sheetKey=""; renderSheet(); }
+  function openSheet(kind,editId=null){ S.noticeChk=undefined; S.sheet=kind; S.editId=editId; S.sheetKey=""; renderSheet(); }
   function closeSheet(){ S.sheet=null; S.editId=null; renderSheet(); }
 
   /* ---------- events ---------- */
@@ -1203,6 +1308,8 @@ html,body{background:var(--page);margin:0}
 
   document.addEventListener("change",e=>{
     const id=e.target.id;
+    if(e.target.classList&&e.target.classList.contains("tk-asg")){ const v=e.target.value; if(!v||!canWrite()) return; (async()=>{ try{ await S.db.doc("tasks/"+e.target.dataset.id).update({assignee:v,assignedAt:new Date().toISOString()}); toast(v+" 담당으로 지정했습니다"); }catch(err){ fail(err); } })(); return; }
+    if(id==="tk-br"){ const sel=$("#tk-stu"); if(sel){ const b=e.target.value; sel.innerHTML='<option value="">학생 연결 (선택)</option>'+S.students.filter(s=>s.active!==false&&s.branch===b).sort((a,c)=>a.name.localeCompare(c.name,"ko")).map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join(""); } return; }
     if(id==="gprog"){ S.gProg=e.target.value; render(); return; }
     if(id==="lsort"){ S.lsort=e.target.value; $("#stuItems").innerHTML=stuItems(); }
     if(id==="gradef"){ S.gradeF=e.target.value; $("#stuItems").innerHTML=stuItems(); }
@@ -1274,6 +1381,13 @@ html,body{background:var(--page);margin:0}
     const b=e.target.closest("[data-act]"); if(!b) return;
     const act=b.dataset.act, id=b.dataset.id;
     if(act==="close"){ closeSheet(); return; }
+    if(act==="tk-done"){ if(!canWrite()) return; const x=S.tasks.find(t=>t.id===id); if(!x) return;
+      try{ await S.db.doc("tasks/"+id).update(x.done?{done:false,doneAt:"",doneBy:""}:{done:true,doneAt:new Date().toISOString(),doneBy:S.uid||""}); if(!x.done) toast("완료했습니다"); }catch(err){ fail(err); } return; }
+    if(act==="tk-miss"){ if(!canWrite()) return; openSheet("tkmiss",id); return; }
+    if(act==="tk-del"){ if(!canWrite()) return; if(S.confirmDel!=="tk:"+id){ S.confirmDel="tk:"+id; toast("한 번 더 누르면 삭제됩니다"); return; } try{ await S.db.doc("tasks/"+id).delete(); S.confirmDel=null; toast("삭제했습니다"); }catch(err){ fail(err); } return; }
+    if(act==="rep-del"){ if(!canWrite()) return; try{ await S.db.doc("repeats/"+id).update({active:false}); toast("반복 업무를 껐습니다"); }catch(err){ fail(err); } return; }
+    if(act==="ntc-off"){ if(!canWrite()) return; const n=S.notes.find(x=>x.id===id); if(!n) return;
+      try{ if(n.studentId) await S.db.doc("notes/"+id).update({notice:false}); else await S.db.doc("notes/"+id).update({notice:false,pinned:false}); toast(n.studentId?"공지에서 내렸습니다 (학생 유지사항은 유지)":"해제했습니다"); }catch(err){ fail(err); } return; }
     if(act==="g-edit"){ S.gEdit=!S.gEdit; render(); return; }
     if(act==="g-add"){ if(!canWrite()) return; openSheet("gslot",b.dataset.d+"|"+b.dataset.n); return; }
     if(act==="g-del"){ if(!canWrite()) return; const s=S.students.find(x=>x.id===id); if(!s) return; const d=+b.dataset.d, n=+b.dataset.n;
@@ -1353,6 +1467,15 @@ html,body{background:var(--page);margin:0}
     e.preventDefault(); if(!canWrite()) return;
     const f=e.target.id;
     try{
+      if(f==="tkmissForm"){ const v=($("#tkm-tx").value||"").trim(); if(!v){ toast("사유를 입력하세요"); return; } await S.db.doc("tasks/"+S.editId).update({carryNote:v}); closeSheet(); toast("사유를 남겼습니다"); return; }
+      if(f==="tkForm"){ const v=($("#tk-tx").value||"").trim(); if(!v){ toast("할 일을 입력하세요"); return; }
+        await S.db.collection("tasks").add({branch:$("#tk-br").value,title:v,studentId:$("#tk-stu").value||"",dueDate:today(),createdBy:S.uid||"",createdAt:new Date().toISOString()});
+        $("#tk-tx").value=""; toast("할 일을 추가했습니다"); return; }
+      if(f==="repForm"){ const v=($("#rep-tx").value||"").trim(), days=[...document.querySelectorAll('#repForm input[name="rd"]:checked')].map(x=>+x.value); if(!v||!days.length){ toast("업무 이름과 요일을 정하세요"); return; }
+        await S.db.collection("repeats").add({branch:$("#rep-br").value,title:v,days,active:true,createdBy:S.uid||"",createdAt:new Date().toISOString()}); toast("반복 업무를 추가했습니다"); return; }
+      if(f==="ntcForm"){ const v=($("#ntc-tx").value||"").trim(); if(!v){ toast("규칙을 입력하세요"); return; }
+        await S.db.collection("notes").add({studentId:"",branch:$("#ntc-br").value,date:today(),type:"유지사항",content:v,nextStep:"",check:"",pinned:true,notice:true,until:$("#ntc-until").value||"",alertDate:"",alertAck:false,ruleId:"",checkNote:"",checkedAt:"",createdBy:S.uid||"",createdAt:new Date().toISOString()});
+        $("#ntc-tx").value=""; toast("고정 관리 사항을 추가했습니다"); return; }
       if(f==="gslotForm"){
         const [d,n]=String(S.editId).split("|").map(Number), ids=[...document.querySelectorAll('#gslotForm input[name="gs"]:checked')].map(x=>x.value);
         if(!ids.length){ toast("학생을 선택하세요"); return; }
@@ -1379,6 +1502,7 @@ html,body{background:var(--page);margin:0}
           const x=S.notes.find(i=>i.id===S.editId);
           const upd={date:$("#sh-date").value||x.date,type:t,content,nextStep:t==="경고"?($("#sh-next")?.value||"").trim():"",editedAt:new Date().toISOString(),editedBy:S.uid||"",ruleId:$("#sh-rule")?.value||""};
           const al=$("#sh-alert").value||""; if(al!==(x.alertDate||"")){ upd.alertDate=al; upd.alertAck=false; }
+          if(t==="유지사항"){ upd.notice=!!$("#sh-notice")?.checked; upd.until=$("#sh-until")?.value||""; } else { upd.notice=false; upd.until=""; }
           if(t==="유지사항"&&x.type!=="유지사항"){ upd.check=""; upd.pinned=true; }
           if(t!=="유지사항"&&x.type==="유지사항"){ upd.check="미확인"; }
           await S.db.doc("notes/"+S.editId).update(upd);
@@ -1387,7 +1511,7 @@ html,body{background:var(--page);margin:0}
         await S.db.collection("notes").add({studentId:s.id,branch:s.branch,date:$("#sh-date").value||today(),type:t,content,
           nextStep:t==="경고"?($("#sh-next")?.value||"").trim():"",check:t==="유지사항"?"":"미확인",pinned:t==="유지사항",
           alertDate:$("#sh-alert").value||"",alertAck:false,ruleId:$("#sh-rule")?.value||"",createdBy:S.uid||"",
-          checkNote:"",checkedAt:"",createdAt:new Date().toISOString()});
+          checkNote:"",checkedAt:"",createdAt:new Date().toISOString(),notice:t==="유지사항"&&!!$("#sh-notice")?.checked,until:t==="유지사항"?($("#sh-until")?.value||""):""});
         closeSheet(); toast("저장했습니다");
       }
       if(f==="qForm"){
@@ -1537,12 +1661,13 @@ html,body{background:var(--page);margin:0}
   }
   function boot(db){
     S.db=db;
-    const got={s:false,n:false,e:false,c:false,m:false,l:false,k:false};
+    const got={s:false,n:false,e:false,c:false,m:false,l:false,k:false,t:false,r:false};
     const go=()=>{ if(Object.values(got).every(Boolean)) S.ready=true; if(S.ready){ render(); resolveNames(); } };
     const sub=(col,key,prop,msg)=>db.collection(col).onSnapshot(s=>{S[prop]=s.docs.map(d=>({id:d.id,...d.data()}));got[key]=true;go()},()=>{S.err=msg;got[key]=true;go()});
     sub("students","s","students","학생 목록을 불러오지 못했습니다. 새로고침해 주세요."); sub("notes","n","notes","기록을 불러오지 못했습니다. 새로고침해 주세요.");
     sub("events","e","events","일정을 불러오지 못했습니다. 새로고침해 주세요.");
     sub("checks","k","checks","점검 기록을 불러오지 못했습니다. 새로고침해 주세요.");
+    sub("tasks","t","tasks","인수인계를 불러오지 못했습니다. 새로고침해 주세요."); sub("repeats","r","repeats","반복 업무를 불러오지 못했습니다.");
     sub("changelog","l","changelog","업데이트 내역을 불러오지 못했습니다. 새로고침해 주세요.");
     sub("chapters","c","chapters","목차를 불러오지 못했습니다. 새로고침해 주세요.");
     sub("manual","m","manual","매뉴얼을 불러오지 못했습니다. 새로고침해 주세요.");
