@@ -847,7 +847,9 @@ html,body{background:var(--page);margin:0}
       toast(to?`${s.name} → ${WD[to.d]} ${to.n?to.n+"교시":""}`:`${s.name} 점검 일정을 뺐습니다`); }catch(err){ fail(err); } });
   document.addEventListener("pointercancel",()=>{ if(gdrag&&!gdrag.on) gEnd(); });
   document.addEventListener("contextmenu",e=>{ if(S.gEdit&&e.target.closest(".gs[data-sid]")) e.preventDefault(); });
-  const ptag=s=>s.program?`<i class="pt p-${esc(s.program)}" title="${esc(s.program)}">${esc(s.program.slice(0,1))}</i>`:"";
+  const PLET={"베이직":"B","시그니처":"S","프리미엄":"P"};
+  const pLetter=x=>PLET[x]||String(x||"").slice(0,1);
+  const ptag=s=>s.program?`<i class="pt p-${esc(s.program)}" title="${esc(s.program)}">${esc(pLetter(s.program))}</i>`:"";
   function chkGrid(){
     const t=today(), br=S.gBranch||S.branch, mon=addDays(S.cal.d,-((wdIdx(S.cal.d)+6)%7)), days=[0,1,2,3,4,5,6].map(i=>addDays(mon,i));
     const studs=S.students.filter(s=>s.active!==false&&s.branch===br&&(!S.calOwn||(s.owner||"")===S.calOwn)&&(!S.gProg||(s.program||"")===S.gProg));
@@ -868,7 +870,7 @@ html,body{background:var(--page);margin:0}
         <select class="sel" id="gprog" aria-label="프로그램">${[["","프로그램 전체"]].concat(PROGRAMS.map(x=>[x,x])).map(([v,l])=>`<option value="${v}" ${(S.gProg||"")===v?"selected":""}>${l}</option>`).join("")}</select>
         <span class="sub" style="margin:0">점검 일정 있는 학생 ${cnt}/${tot}명</span><span style="flex:1"></span>
         ${canWrite()?`<button class="mini ${S.gEdit?"ok":""}" data-act="g-edit">${S.gEdit?"편집 완료":"✎ 편집"}</button>`:""}</div>
-      <div class="g-leg"><span class="gs done">✓ 완료</span><span class="gs now">오늘</span><span class="gs over">! 밀림</span><span class="gs fut">예정</span><span class="sub" style="margin:0">${PROGRAMS.map(x=>`<i class="pt p-${esc(x)}">${esc(x.slice(0,1))}</i> ${esc(x)}`).join(" · ")} · ⚠ = 못 함 사유 있음 · 이름을 누르면 학생 화면</span></div>
+      <div class="g-leg"><span class="gs done">✓ 완료</span><span class="gs now">오늘</span><span class="gs over">! 밀림</span><span class="gs fut">예정</span><span class="sub" style="margin:0">${PROGRAMS.map(x=>`<i class="pt p-${esc(x)}">${esc(pLetter(x))}</i> ${esc(x)}`).join(" · ")} · ⚠ = 못 함 사유 있음 · 이름을 누르면 학생 화면</span></div>
       <div class="gwrap"><div class="grid7">${'<div class="gp gp-h"></div>'+head+body}</div></div>
       <div class="gtray gtray-bot ${cw?"edit":""}"><div class="gtray-h">미배정 ${tray.length}명${cw&&tray.length?` <span class="sub" style="margin:0">— 이름을 ${matchMedia("(pointer:coarse)").matches?"꾹 누른 채":"잡고"} 칸으로 끌어 넣기</span>`:""}</div>
         <div class="gtray-b">${tray.map(s=>`<span class="gs fut ${oc(s.owner)}" ${cw?`data-sid="${s.id}"`:`data-gostu="${s.id}" role="button" tabindex="0"`}>${ptag(s)}${esc(s.name)}</span>`).join("")||'<span class="sub" style="margin:0">모든 학생이 배정됐습니다.</span>'}</div>
