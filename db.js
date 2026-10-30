@@ -13,7 +13,7 @@
   const toCol = k => SPECIAL[k] || k.replace(/[A-Z]/g, m => "_" + m.toLowerCase());
   const toKey = c => SPECIAL_R[c] || c.replace(/_([a-z])/g, (_, m) => m.toUpperCase());
   // 날짜·uuid·숫자 컬럼은 빈 문자열을 null로 저장
-  const TYPED = new Set(["date", "checked_at", "checked_by", "alert_date", "created_by", "edited_by",
+  const TYPED = new Set(["date", "due_date", "done_date", "check_since", "checked_at", "checked_by", "alert_date", "created_by", "edited_by",
     "updated_by", "by", "created_at", "edited_at", "updated_at", "at", "grade_year", "alert_days", "student_id"]);
   const KEEP_NULL = new Set(["alertDays", "gradeYear"]);
 
