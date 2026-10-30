@@ -198,6 +198,58 @@ main{flex:1;padding-block:14px 120px;padding-left:max(16px,env(safe-area-inset-l
 .chk-hist .ok{color:var(--green)} .chk-hist .ng{color:var(--red)}
 .w-chk{order:-1}
 .w-ntc{order:-3}.w-task{order:-2}
+/* 정갈한 카드 */
+.dash.hs .hcolL,.dash.hs .hcolR,.dash.hs .hrow3,.dash.hs .hrow2{display:contents}
+.dash.hs .w{padding:0;gap:0;border-radius:14px;overflow:hidden}
+.dash.hs .w>.w-h{padding:13px 18px;border-bottom:1px solid var(--line);margin:0;min-height:54px;align-items:center;gap:8px}
+.dash.hs .w>.w-h h3{white-space:nowrap;flex:1}
+.dash.hs .cbody{padding:4px 18px 14px;display:flex;flex-direction:column;gap:8px;min-height:0}
+.cnt{font-family:var(--title);font-size:13px;color:var(--muted);white-space:nowrap}
+.cnt b{color:var(--red);font-weight:400}
+.hadd{width:30px;height:30px;border:0;border-radius:50%;background:var(--pink);color:#fff;font-size:19px;line-height:1;cursor:pointer;flex:0 0 auto}
+.hadd.on{background:var(--surface2);color:var(--fg)}
+.addbox{background:var(--surface);border-radius:12px;padding:10px 12px;display:grid;gap:8px;margin-top:8px}
+.addbox .addrow{margin:0}
+.dash.hs .ntc-list{gap:0}
+.dash.hs .ntc-row{background:transparent;border-radius:0;border-bottom:1px solid var(--line);padding:10px 0 10px 12px;box-shadow:inset 3px 0 0 var(--amber)}
+.dash.hs .ntc-row.exp{box-shadow:inset 3px 0 0 var(--red)}
+.dash.hs .ntc-who{background:var(--surface);font-size:13px}
+@media (min-width:900px){ .dash.hs .ntc-row{flex-wrap:nowrap} .dash.hs .ntc-tx{flex:1 1 auto} .dash.hs .ntc-side{flex:0 0 auto;flex-direction:column;align-items:flex-end} .dash.hs .ntc-side:empty{display:none} }
+.dash.hs .tk{background:transparent!important;border-radius:0;border-bottom:1px solid var(--line);margin:0;padding:11px 0;box-shadow:none!important}
+.dash.hs .tk.esc .tk-tt{color:var(--red)} .dash.hs .tk.carry .tk-tt{color:#8A5A10}
+.dash.hs .tk-sec{margin:10px 0 0;font-size:12px;color:var(--muted)}
+.dash.hs .tk-sec.r{color:var(--red)} .dash.hs .tk-sec.a{color:var(--amber)}
+.dash.hs .chk-row{background:transparent;border-radius:0;border-bottom:1px solid var(--line);margin:0;padding:10px 0;box-shadow:none}
+.dash.hs .chk-row.over .chk-info .chip.c-warn{background:transparent;color:var(--red);padding:0}
+.dash.hs .chk-sub{margin:8px 0 0;font-size:12px;color:var(--muted)}
+.dash.hs .chk-f{padding-top:8px}
+.dash.hs .chk-foot{margin-top:4px}
+.dash.hs .al{background:transparent;border-radius:0;border-bottom:1px solid var(--line);padding:11px 0}
+.dash.hs .evrow{background:transparent;border-radius:0;border-bottom:1px solid var(--line);padding:10px 0}
+.dash.hs .w-empty{padding:28px 0;text-align:center;color:var(--muted)}
+.dash.hs .w-cal .w-h h3{text-align:center}
+@media (hover:hover) and (min-width:900px){
+  .dash.hs .tk-meta .mini,.dash.hs .tk-meta .link-btn,.dash.hs .tk-meta select{display:none}
+  .dash.hs .tk:hover .tk-meta .mini,.dash.hs .tk:hover .tk-meta .link-btn,.dash.hs .tk:hover .tk-meta select,.dash.hs .tk:focus-within .tk-meta select{display:inline-block}
+  .dash.hs .tk.esc .tk-meta select{display:inline-block}
+  .dash.hs .ntc-row .mini{visibility:hidden} .dash.hs .ntc-row:hover .mini{visibility:visible}
+  .dash.hs .chk-acts .mini:not(.ok){visibility:hidden} .dash.hs .chk-row:hover .chk-acts .mini{visibility:visible}
+}
+@media (min-width:900px){
+  .dash.hs{display:grid;grid-template-columns:minmax(300px,1fr) minmax(0,3fr);grid-template-areas:none;gap:16px;align-items:start}
+  .dash.hs .w{grid-area:auto;order:0}
+  .dash.hs .hcolL{display:flex;flex-direction:column;gap:16px;position:sticky;top:76px;max-height:calc(100vh - 96px);min-width:0}
+  .dash.hs .hcolL .w-ntc{flex:0 1 auto;max-height:40%;display:flex;flex-direction:column}
+  .dash.hs .hcolL .w-task{flex:1 1 auto;min-height:260px;display:flex;flex-direction:column}
+  .dash.hs .hcolL .cbody{overflow:auto}
+  .dash.hs .hcolR{display:flex;flex-direction:column;gap:16px;min-width:0}
+  .dash.hs .hrow3{display:grid;grid-template-columns:1.15fr 1fr 1fr;gap:16px;align-items:stretch}
+  .dash.hs .hrow2{display:grid;grid-template-columns:2.15fr 1fr;gap:16px;align-items:stretch}
+  .dash.hs .w-chk .cbody{max-height:420px;overflow:auto}
+  .dash.hs .hrow3 .w{min-height:440px}
+  .dash.hs .w-alert .cbody{overflow:auto;max-height:520px}
+}
+@media (min-width:900px) and (max-width:1300px){ .dash.hs .hrow3,.dash.hs .hrow2{grid-template-columns:1fr 1fr} .dash.hs .hrow3 .w-quick{grid-column:1/-1} .dash.hs .hrow3 .w{min-height:0} }
 .ntc{display:flex;gap:6px;align-items:center;font-size:14px;cursor:pointer}
 .ntc-chip{background:var(--pink-soft);color:var(--pink);border-radius:6px;padding:0 6px}
 .ntc-list{display:grid;gap:6px}
@@ -357,7 +409,7 @@ main{flex:1;padding-block:14px 120px;padding-left:max(16px,env(safe-area-inset-l
   .tabbar{display:none}
   .app{max-width:none;margin:0 0 0 84px}
   main{padding-block:18px 40px;width:100%;max-width:780px;margin:0 auto}
-  .app.home main{max-width:1320px}
+  .app.home main{max-width:1640px}
   .app:not(.home) main{max-width:820px;margin:20px auto 40px;padding:22px 26px 32px;border:1px solid var(--line);border-radius:20px;box-shadow:0 1px 3px rgba(20,24,40,.04)}
   .app.calv main{max-width:1240px}
   .app:not(.home) .top{background:var(--bar)}
@@ -867,34 +919,34 @@ html,body{background:var(--page);margin:0}
     const stuOpts=b=>S.students.filter(s=>s.active!==false&&(!b||s.branch===b)).sort((a,c)=>a.name.localeCompare(c.name,"ko")).map(s=>`<option value="${s.id}">${esc(s.name)}${b?"":" ("+s.branch+")"}</option>`).join("");
     ensureRepeats();
     m.innerHTML=`${S.err?`<p class="status">${esc(S.err)}</p>`:""}<div class="dash">
-      <section class="w w-ntc"><div class="w-h"><h3>📢 고정 관리 사항</h3><span class="chip c-keep">${NL.length}건</span><span class="sub" style="margin:0">${S.hBr?S.hBr+"점 + 공통":"전 지점"}</span></div>
+      <section class="w w-ntc"><div class="w-h"><h3>📢 고정 관리 사항</h3><span class="cnt">${NL.length}건</span>${canWrite()?`<button class="hadd ${S.hAdd==="ntc"?"on":""}" data-act="hadd" data-k="ntc" aria-label="고정 관리 사항 추가">${S.hAdd==="ntc"?"×":"+"}</button>`:""}</div>
         ${NL.length?`<div class="ntc-list">${NL.map(({n,exp})=>{const sn=stuName(n.studentId);return `<div class="ntc-row ${exp?"exp":""}">
           ${sn?`<button class="ntc-who" data-gostu="${n.studentId}">${esc(sn)}</button>`:`<span class="ntc-who com">${n.branch==="공통"?"공통":esc(n.branch)+"점"}</span>`}
           <div class="ntc-tx">${esc(n.content)}</div>
           <div class="ntc-side">${n.until?`<span class="chip ${exp?"c-warn":"c-mute"}">${exp?"종료일 지남 · 해제 확인":"~"+fmt(n.until)}</span>`:""}${canWrite()?`<button class="mini" data-act="ntc-off" data-id="${n.id}">해제</button>`:""}</div></div>`}).join("")}</div>`
           :`<div class="w-empty">근무자 전원이 지켜야 할 규칙이 없습니다.</div>`}
-        ${canWrite()?`<form id="ntcForm" class="addrow"><input class="field" id="ntc-tx" placeholder="공통 규칙 추가 (예: 기침하는 학생은 마스크 착용 지시)" autocomplete="off"><select class="sel" id="ntc-br"><option value="공통" selected>공통</option><option value="목동">목동점</option><option value="사우">사우점</option></select><input class="field" id="ntc-until" type="date" title="종료일 (선택)" style="max-width:160px"><button class="qsave" type="submit">추가</button></form>
-          <p class="hint" style="margin-top:6px">학생별 규칙은 학생 화면 「+ 유지사항」에서 「📢 근무자 공지」를 체크하면 여기에 함께 뜹니다.</p>`:""}
+        ${canWrite()&&S.hAdd==="ntc"?`<form id="ntcForm" class="addrow addbox"><input class="field" id="ntc-tx" placeholder="공통 규칙 (예: 기침하는 학생은 마스크 착용 지시)" autocomplete="off" value="${esc((S.hv||{})["ntc-tx"]||"")}"><select class="sel" id="ntc-br"><option value="공통" selected>공통</option><option value="목동">목동점</option><option value="사우">사우점</option></select><input class="field" id="ntc-until" type="date" title="종료일 (선택)" style="max-width:160px"><button class="qsave" type="submit">추가</button></form>
+          <p class="hint" style="margin:0">학생별 규칙은 학생 화면 「+ 유지사항」에서 「📢 근무자 공지」를 체크하세요.</p>`:""}
       </section>
-      <section class="w w-task"><div class="w-h"><h3>인수인계 할 일</h3>${TL.esc.length?`<span class="chip c-warn">확인 필요 ${TL.esc.length}</span>`:""}${TL.carry.length?`<span class="chip c-keep">이월 ${TL.carry.length}</span>`:""}<span class="chip c-dir">오늘 ${TL.now.length}</span></div>
-        ${TL.esc.length?`<div class="tk-sec r">⚠ 실장 확인 필요 <span class="sub" style="margin:0">— 2근무일째 미완료, 담당을 지정하세요</span></div>${TL.esc.map(taskRow).join("")}`:""}
+      <section class="w w-task"><div class="w-h"><h3>인수인계 할 일</h3><span class="cnt">${TL.esc.length?`<b>확인 ${TL.esc.length}</b> · `:""}${TL.carry.length?`이월 ${TL.carry.length} · `:""}오늘 ${TL.now.length}</span>${canWrite()?`<button class="hadd ${S.hAdd==="task"?"on":""}" data-act="hadd" data-k="task" aria-label="할 일 추가">${S.hAdd==="task"?"×":"+"}</button>`:""}</div>
+        ${TL.esc.length?`<div class="tk-sec r">⚠ 실장 확인 필요 · 담당 지정</div>${TL.esc.map(taskRow).join("")}`:""}
         ${TL.carry.length?`<div class="tk-sec a">↪ 이전 근무에서 넘어온 일</div>${TL.carry.map(taskRow).join("")}`:""}
         ${TL.now.length?`<div class="tk-sec">오늘 할 일</div>${TL.now.map(taskRow).join("")}`:""}
         ${!TL.esc.length&&!TL.carry.length&&!TL.now.length?`<div class="w-empty">남은 인수인계가 없습니다.</div>`:""}
-        ${canWrite()?`<form id="tkForm" class="addrow"><input class="field" id="tk-tx" placeholder="할 일 추가 (예: 장민서 일정 변동 문자 전송)" autocomplete="off"><select class="sel" id="tk-br">${brOpts}</select><select class="sel" id="tk-stu"><option value="">학생 연결 (선택)</option>${stuOpts(S.hBr)}</select><button class="qsave" type="submit">추가</button></form>
+        ${canWrite()&&S.hAdd==="task"?`<div class="addbox"><form id="tkForm" class="addrow"><input class="field" id="tk-tx" placeholder="할 일 (예: 장민서 일정 변동 문자 전송)" autocomplete="off" value="${esc((S.hv||{})["tk-tx"]||"")}"><select class="sel" id="tk-br">${brOpts}</select><select class="sel" id="tk-stu"><option value="">학생 연결 (선택)</option>${stuOpts(S.hBr)}</select><button class="qsave" type="submit">추가</button></form>
           <details class="tk-rep"><summary>반복 업무 ${S.repeats.filter(r=>r.active!==false&&(!S.hBr||r.branch===S.hBr)).length}개 (영단어 채점·분리수거 등)</summary>
             ${S.repeats.filter(r=>r.active!==false&&(!S.hBr||r.branch===S.hBr)).map(r=>`<div class="rep-row"><span class="chip b-${esc(r.branch)}">${esc(r.branch)}</span><b>${esc(r.title)}</b><span class="sub" style="margin:0">${(r.days||[]).length===7?"매일":[1,2,3,4,5,6,0].filter(d=>(r.days||[]).map(Number).includes(d)).map(d=>WD[d]).join("·")}</span><button class="link-btn" data-act="rep-del" data-id="${r.id}">삭제</button></div>`).join("")||'<div class="sub">등록된 반복 업무가 없습니다.</div>'}
-            <form id="repForm" class="addrow"><input class="field" id="rep-tx" placeholder="반복 업무 (예: 영단어 채점)" autocomplete="off"><select class="sel" id="rep-br">${brOpts}</select>
-              <span class="rep-days">${[1,2,3,4,5,6,0].map(d=>`<label><input type="checkbox" name="rd" value="${d}" checked>${WD[d]}</label>`).join("")}</span><button class="qsave" type="submit">추가</button></form></details>`:""}
+            <form id="repForm" class="addrow"><input class="field" id="rep-tx" placeholder="반복 업무 (예: 영단어 채점)" autocomplete="off" value="${esc((S.hv||{})["rep-tx"]||"")}"><select class="sel" id="rep-br">${brOpts}</select>
+              <span class="rep-days">${[1,2,3,4,5,6,0].map(d=>`<label><input type="checkbox" name="rd" value="${d}" checked>${WD[d]}</label>`).join("")}</span><button class="qsave" type="submit">추가</button></form></details></div>`:""}
         ${TL.done.length?`<details class="tk-done"><summary>오늘 완료 ${TL.done.length}건</summary>${TL.done.map(x=>taskRow({x,age:0})).join("")}</details>`:""}
       </section>
-      <section class="w w-chk"><div class="w-h"><h3>점검</h3>${CL.over.length?`<span class="chip c-warn">밀림 ${CL.over.length}명</span>`:""}<span class="chip c-dir">오늘 ${CL.now.length}명</span></div>
+      <section class="w w-chk"><div class="w-h"><h3>점검</h3><span class="cnt">${CL.over.length?`<b>밀림 ${CL.over.length}</b> · `:""}오늘 ${CL.now.length}</span><button class="more-btn" data-act="go-grid">점검표 ›</button></div>
         <div class="chk-f"><div class="vseg">${[["","전체"],["목동","목동점"],["사우","사우점"]].map(([v,l])=>`<button data-hbr="${v}" aria-pressed="${(S.hBr||"")===v}">${l}</button>`).join("")}</div>
           <div class="fbar" style="margin:0">${[""].concat(PROGRAMS).map(x=>`<button class="fchip" data-hprog="${esc(x)}" aria-pressed="${(S.hProg||"")===x}">${x?`${`<i class="pt p-${esc(x)}">${esc(pLetter(x))}</i>`}${esc(x)}`:"프로그램 전체"}</button>`).join("")}</div></div>
         ${S.hBr?chkBlock(CL,""):`<div class="chk-cols">${["목동","사우"].map(b=>`<div>${chkBlock(split(CL,b),b+"점")}</div>`).join("")}</div>`}
-        ${noSlot?`<div class="sub">점검 요일이 등록되지 않은 재원생 ${noSlot}명 (프리미엄 제외) — 캘린더 「점검표」에서 등록</div>`:""}
+        ${noSlot?`<div class="sub chk-foot">점검 요일 미등록 ${noSlot}명 (프리미엄 제외)</div>`:""}
       </section>
-      <section class="w w-alert"><div class="w-h"><h3>확인할 학생</h3><span class="chip c-dir">${alerts.length}명</span></div>
+      <section class="w w-alert"><div class="w-h"><h3>확인할 학생</h3><span class="cnt">${alerts.length}명</span></div>
         ${alerts.length?`<div style="display:grid;gap:6px">${alerts.slice(0,8).map(a=>`<button class="al" data-gostu="${a.s.id}"><span class="nm">${esc(a.s.name)}</span>${a.s.program?`<span class="pchip p-${esc(a.s.program)}">${esc(a.s.program)}</span>`:""}<span class="chip b-${esc(a.s.branch)}">${esc(a.s.branch)}</span>${a.warn?`<span class="chip c-warn">경고 ${a.warn}</span>`:""}${a.open?`<span class="chip c-dir">확인 ${a.open}</span>`:""}</button>`).join("")}
           ${alerts.length>8?`<div class="sub">외 ${alerts.length-8}명</div>`:""}</div>`:`<div class="w-empty">이행을 확인할 기록이 없습니다.</div>`}
       </section>
@@ -909,13 +961,21 @@ html,body{background:var(--page);margin:0}
       </section>
       <section class="w w-cal"><div class="w-h"><button class="icon-btn" data-act="cal-prev" aria-label="이전 달">‹</button><h3 style="text-align:center">${y}년 ${mo}월</h3><button class="icon-btn" data-act="cal-next" aria-label="다음 달">›</button></div>
         <div class="mcal">${wkHead()}${cells}</div>
-        <div class="sub">날짜를 누르면 캘린더에서 그날 일정을 엽니다. 점 색: 파랑 한승종 · 초록 강한빛 · 회색 담당 없음</div>
       </section>
       <section class="w w-man"><div class="w-h"><h3>매뉴얼</h3><button class="more-btn" data-tabgo="매뉴얼">목차 보기 ›</button></div>
         <input class="search" id="dsearch" type="text" placeholder="상황으로 찾기 (예: 환불, 무단결석)" value="${esc(S.dq)}">
         <div id="dResults">${dManResults()}</div>
       </section>
     </div>`;
+    homeLayout(m);
+  }
+  function homeLayout(m){
+    const d=m.querySelector(".dash"); if(!d) return; d.classList.add("hs"); const q=c=>d.querySelector(".w-"+c);
+    d.querySelectorAll(":scope>.w").forEach(w=>{ const hd=w.querySelector(":scope>.w-h"), b=document.createElement("div"); b.className="cbody"; [...w.children].forEach(ch=>{ if(ch!==hd) b.appendChild(ch); }); w.appendChild(b); });
+    const mk=(c,...ws)=>{ const x=document.createElement("div"); x.className=c; ws.forEach(w=>w&&x.appendChild(w)); return x; };
+    const L=mk("hcolL",q("ntc"),q("task")), R=mk("hcolR",q("chk"),mk("hrow3",q("cal"),q("alert"),q("quick")),mk("hrow2",q("up"),q("man")));
+    d.append(L,R);
+    const f=S.hAdd&&document.getElementById(S.hAdd==="ntc"?"ntc-tx":"tk-tx"); if(f&&S.hAddFocus){ f.focus(); S.hAddFocus=false; }
   }
 
   /* ---------- calendar ---------- */
@@ -1297,6 +1357,7 @@ html,body{background:var(--page);margin:0}
 
   /* ---------- events ---------- */
   document.addEventListener("input",e=>{
+    if(["tk-tx","ntc-tx","rep-tx"].includes(e.target.id)){ (S.hv=S.hv||{})[e.target.id]=e.target.value; }
     if(e.target.id==="gpick-q"||e.target.id==="gpick-all"){ gpickFilter(); return; }
     if(e.target.closest&&e.target.closest("#gslotForm")&&e.target.name==="gs"){ gpickCount(); }
     if(e.target.id==="search"){ S.search=e.target.value; $("#stuItems").innerHTML=stuItems(); }
@@ -1388,6 +1449,8 @@ html,body{background:var(--page);margin:0}
     if(act==="rep-del"){ if(!canWrite()) return; try{ await S.db.doc("repeats/"+id).update({active:false}); toast("반복 업무를 껐습니다"); }catch(err){ fail(err); } return; }
     if(act==="ntc-off"){ if(!canWrite()) return; const n=S.notes.find(x=>x.id===id); if(!n) return;
       try{ if(n.studentId) await S.db.doc("notes/"+id).update({notice:false}); else await S.db.doc("notes/"+id).update({notice:false,pinned:false}); toast(n.studentId?"공지에서 내렸습니다 (학생 유지사항은 유지)":"해제했습니다"); }catch(err){ fail(err); } return; }
+    if(act==="hadd"){ S.hAdd=S.hAdd===b.dataset.k?null:b.dataset.k; S.hAddFocus=true; render(); return; }
+    if(act==="go-grid"){ S.tab="캘린더"; S.calView="점검표"; S.gBranch=S.hBr||S.gBranch; try{localStorage.setItem("jlog-tab",S.tab)}catch(_){} render(); scrollTo(0,0); return; }
     if(act==="g-edit"){ S.gEdit=!S.gEdit; render(); return; }
     if(act==="g-add"){ if(!canWrite()) return; openSheet("gslot",b.dataset.d+"|"+b.dataset.n); return; }
     if(act==="g-del"){ if(!canWrite()) return; const s=S.students.find(x=>x.id===id); if(!s) return; const d=+b.dataset.d, n=+b.dataset.n;
@@ -1470,12 +1533,12 @@ html,body{background:var(--page);margin:0}
       if(f==="tkmissForm"){ const v=($("#tkm-tx").value||"").trim(); if(!v){ toast("사유를 입력하세요"); return; } await S.db.doc("tasks/"+S.editId).update({carryNote:v}); closeSheet(); toast("사유를 남겼습니다"); return; }
       if(f==="tkForm"){ const v=($("#tk-tx").value||"").trim(); if(!v){ toast("할 일을 입력하세요"); return; }
         await S.db.collection("tasks").add({branch:$("#tk-br").value,title:v,studentId:$("#tk-stu").value||"",dueDate:today(),createdBy:S.uid||"",createdAt:new Date().toISOString()});
-        $("#tk-tx").value=""; toast("할 일을 추가했습니다"); return; }
+        $("#tk-tx").value=""; (S.hv=S.hv||{})["tk-tx"]=""; toast("할 일을 추가했습니다"); return; }
       if(f==="repForm"){ const v=($("#rep-tx").value||"").trim(), days=[...document.querySelectorAll('#repForm input[name="rd"]:checked')].map(x=>+x.value); if(!v||!days.length){ toast("업무 이름과 요일을 정하세요"); return; }
-        await S.db.collection("repeats").add({branch:$("#rep-br").value,title:v,days,active:true,createdBy:S.uid||"",createdAt:new Date().toISOString()}); toast("반복 업무를 추가했습니다"); return; }
+        await S.db.collection("repeats").add({branch:$("#rep-br").value,title:v,days,active:true,createdBy:S.uid||"",createdAt:new Date().toISOString()}); (S.hv=S.hv||{})["rep-tx"]=""; toast("반복 업무를 추가했습니다"); return; }
       if(f==="ntcForm"){ const v=($("#ntc-tx").value||"").trim(); if(!v){ toast("규칙을 입력하세요"); return; }
         await S.db.collection("notes").add({studentId:"",branch:$("#ntc-br").value,date:today(),type:"유지사항",content:v,nextStep:"",check:"",pinned:true,notice:true,until:$("#ntc-until").value||"",alertDate:"",alertAck:false,ruleId:"",checkNote:"",checkedAt:"",createdBy:S.uid||"",createdAt:new Date().toISOString()});
-        $("#ntc-tx").value=""; toast("고정 관리 사항을 추가했습니다"); return; }
+        $("#ntc-tx").value=""; (S.hv=S.hv||{})["ntc-tx"]=""; toast("고정 관리 사항을 추가했습니다"); return; }
       if(f==="gslotForm"){
         const [d,n]=String(S.editId).split("|").map(Number), ids=[...document.querySelectorAll('#gslotForm input[name="gs"]:checked')].map(x=>x.value);
         if(!ids.length){ toast("학생을 선택하세요"); return; }
