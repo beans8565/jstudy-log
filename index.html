@@ -211,6 +211,10 @@ main{flex:1;padding-block:14px 120px;padding-left:max(16px,env(safe-area-inset-l
 .gc{min-height:54px;padding:5px;display:flex;flex-wrap:wrap;gap:4px;align-content:flex-start}
 .gc.today{background:#FFF8F8}
 .gs{display:inline-flex;align-items:center;gap:3px;font-family:var(--title);font-size:13px;border-radius:7px;padding:2px 7px;background:var(--surface);border-left:3px solid var(--oc,var(--line));cursor:pointer;white-space:nowrap}
+.pt{font-style:normal;font-family:var(--title);font-size:10px;line-height:1;min-width:15px;height:15px;border-radius:4px;display:inline-grid;place-items:center;margin-right:3px;background:var(--surface2);color:var(--muted)}
+.pt.p-시그니처{background:var(--green);color:#fff}
+.pt.p-프리미엄{background:#1F1F24;color:#F2C46B}
+.pt.p-베이직{background:#8A8F99;color:#fff}
 .gs.done{background:var(--green-bg);color:var(--green)}
 .gs.now{background:var(--blue-bg);color:var(--blue)}
 .gs.over{background:var(--red-bg);color:var(--red)}
@@ -843,9 +847,10 @@ html,body{background:var(--page);margin:0}
       toast(to?`${s.name} → ${WD[to.d]} ${to.n?to.n+"교시":""}`:`${s.name} 점검 일정을 뺐습니다`); }catch(err){ fail(err); } });
   document.addEventListener("pointercancel",()=>{ if(gdrag&&!gdrag.on) gEnd(); });
   document.addEventListener("contextmenu",e=>{ if(S.gEdit&&e.target.closest(".gs[data-sid]")) e.preventDefault(); });
+  const ptag=s=>s.program?`<i class="pt p-${esc(s.program)}" title="${esc(s.program)}">${esc(s.program.slice(0,1))}</i>`:"";
   function chkGrid(){
     const t=today(), br=S.gBranch||S.branch, mon=addDays(S.cal.d,-((wdIdx(S.cal.d)+6)%7)), days=[0,1,2,3,4,5,6].map(i=>addDays(mon,i));
-    const studs=S.students.filter(s=>s.active!==false&&s.branch===br&&(!S.calOwn||(s.owner||"")===S.calOwn));
+    const studs=S.students.filter(s=>s.active!==false&&s.branch===br&&(!S.calOwn||(s.owner||"")===S.calOwn)&&(!S.gProg||(s.program||"")===S.gProg));
     const cell={}, stc={}; let maxN=9, hasZero=false;
     studs.forEach(s=>{ stc[s.id]=chkState(s); slotsOf(s).forEach(x=>{ const n=pNum(x); if(!n) hasZero=true; if(n>maxN) maxN=n; (cell[+x.d+"-"+n]=cell[+x.d+"-"+n]||[]).push({s,x}); }); });
     const stat=(s,d,x)=>{ const st=stc[s.id]; if(d>t) return "fut"; const pd=st.pending.find(q=>q.date===d); if(pd) return d<t?"over":"now"; const since=x.s||s.checkSince; return since&&d>=since?"done":"pre"; };
@@ -857,15 +862,16 @@ html,body{background:var(--page);margin:0}
     const head=days.map(d=>{const w=wdIdx(d);return `<div class="gh ${d===t?"today":""} ${w===0?"sun":w===6?"sat":""}">${WD[w]}<span>${fmt(d)}</span></div>`}).join("");
     const body=rows.map(n=>`<div class="gp">${n?n+"교시":"미정"}</div>`+days.map(d=>{ const w=wdIdx(d), list=(cell[w+"-"+n]||[]).sort((a,b)=>a.s.name.localeCompare(b.s.name,"ko"));
       return `<div class="gc ${d===t?"today":""}" data-d="${w}" data-n="${n}">${list.map(({s,x})=>{const k=stat(s,d,x), ms=missOf(s,d);
-        return `<span class="gs ${k} ${oc(s.owner)}" ${cw?`data-sid="${s.id}"`:`data-gostu="${s.id}" role="button" tabindex="0"`} title="${esc(s.name)} · ${k==="done"?"점검 완료":k==="over"?"밀림":k==="now"?"오늘 점검":k==="fut"?"예정":""}${ms?" · 못 함: "+esc(ms.reason):""}">${k==="done"?"✓ ":k==="over"?"! ":""}${esc(s.name)}${ms?" ⚠":""}${cw?`<button data-act="g-del" data-id="${s.id}" data-d="${w}" data-n="${n}" aria-label="${esc(s.name)} 빼기">✕</button>`:""}</span>`}).join("")}
+        return `<span class="gs ${k} ${oc(s.owner)}" ${cw?`data-sid="${s.id}"`:`data-gostu="${s.id}" role="button" tabindex="0"`} title="${esc(s.name)} · ${k==="done"?"점검 완료":k==="over"?"밀림":k==="now"?"오늘 점검":k==="fut"?"예정":""}${ms?" · 못 함: "+esc(ms.reason):""}">${ptag(s)}${k==="done"?"✓ ":k==="over"?"! ":""}${esc(s.name)}${ms?" ⚠":""}${cw?`<button data-act="g-del" data-id="${s.id}" data-d="${w}" data-n="${n}" aria-label="${esc(s.name)} 빼기">✕</button>`:""}</span>`}).join("")}
         ${cw?`<button class="g-add" data-act="g-add" data-d="${w}" data-n="${n}" aria-label="${WD[w]} ${n}교시에 학생 추가">+</button>`:""}</div>`}).join("")).join("");
     return `<div class="g-top"><div class="bseg" style="margin:0">${["목동","사우"].map(b=>`<button data-gbr="${b}" aria-pressed="${br===b}">${b}점</button>`).join("")}</div>
+        <select class="sel" id="gprog" aria-label="프로그램">${[["","프로그램 전체"]].concat(PROGRAMS.map(x=>[x,x])).map(([v,l])=>`<option value="${v}" ${(S.gProg||"")===v?"selected":""}>${l}</option>`).join("")}</select>
         <span class="sub" style="margin:0">점검 일정 있는 학생 ${cnt}/${tot}명</span><span style="flex:1"></span>
         ${canWrite()?`<button class="mini ${S.gEdit?"ok":""}" data-act="g-edit">${S.gEdit?"편집 완료":"✎ 편집"}</button>`:""}</div>
-      <div class="g-leg"><span class="gs done">✓ 완료</span><span class="gs now">오늘</span><span class="gs over">! 밀림</span><span class="gs fut">예정</span><span class="sub" style="margin:0">⚠ = 못 함 사유 있음 · 이름을 누르면 학생 화면</span></div>
+      <div class="g-leg"><span class="gs done">✓ 완료</span><span class="gs now">오늘</span><span class="gs over">! 밀림</span><span class="gs fut">예정</span><span class="sub" style="margin:0">${PROGRAMS.map(x=>`<i class="pt p-${esc(x)}">${esc(x.slice(0,1))}</i> ${esc(x)}`).join(" · ")} · ⚠ = 못 함 사유 있음 · 이름을 누르면 학생 화면</span></div>
       <div class="gwrap"><div class="grid7">${'<div class="gp gp-h"></div>'+head+body}</div></div>
       <div class="gtray gtray-bot ${cw?"edit":""}"><div class="gtray-h">미배정 ${tray.length}명${cw&&tray.length?` <span class="sub" style="margin:0">— 이름을 ${matchMedia("(pointer:coarse)").matches?"꾹 누른 채":"잡고"} 칸으로 끌어 넣기</span>`:""}</div>
-        <div class="gtray-b">${tray.map(s=>`<span class="gs fut ${oc(s.owner)}" ${cw?`data-sid="${s.id}"`:`data-gostu="${s.id}" role="button" tabindex="0"`}>${esc(s.name)}</span>`).join("")||'<span class="sub" style="margin:0">모든 학생이 배정됐습니다.</span>'}</div>
+        <div class="gtray-b">${tray.map(s=>`<span class="gs fut ${oc(s.owner)}" ${cw?`data-sid="${s.id}"`:`data-gostu="${s.id}" role="button" tabindex="0"`}>${ptag(s)}${esc(s.name)}</span>`).join("")||'<span class="sub" style="margin:0">모든 학생이 배정됐습니다.</span>'}</div>
         ${prem.length?`<div class="sub" style="margin:8px 0 0">프리미엄 ${prem.length}명은 원장님 학습관리라 미배정에서 뺐습니다 (${esc(prem.map(s=>s.name).join(", "))}). 꼭 넣어야 하면 + 창에서 「이미 배정된 학생·프리미엄도 보기」를 체크하세요.</div>`:""}</div>
       ${S.gEdit?`<p class="hint" style="margin-top:8px">이름을 ${matchMedia("(pointer:coarse)").matches?"꾹 누른 채":"잡고"} 다른 칸으로 끌면 옮겨지고, 아래 「미배정」 칸으로 끌면 빠집니다. + 로 여러 명 한 번에 넣기, ✕ 로 빼기.</p>`:""}`;
   }
@@ -1183,6 +1189,7 @@ html,body{background:var(--page);margin:0}
 
   document.addEventListener("change",e=>{
     const id=e.target.id;
+    if(id==="gprog"){ S.gProg=e.target.value; render(); return; }
     if(id==="lsort"){ S.lsort=e.target.value; $("#stuItems").innerHTML=stuItems(); }
     if(id==="gradef"){ S.gradeF=e.target.value; $("#stuItems").innerHTML=stuItems(); }
     if(id==="progf"){ S.progF=e.target.value; $("#stuItems").innerHTML=stuItems(); }
