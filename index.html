@@ -211,10 +211,12 @@ main{flex:1;padding-block:14px 120px;padding-left:max(16px,env(safe-area-inset-l
 .addbox{background:var(--surface);border-radius:12px;padding:10px 12px;display:grid;gap:8px;margin-top:8px}
 .addbox .addrow{margin:0}
 .dash.hs .ntc-list{gap:0}
+.ntc-g{font-family:var(--title);font-size:12px;color:var(--muted);margin:10px 0 0;display:flex;gap:6px;align-items:center}
+.ntc-g span{background:var(--surface);border-radius:6px;padding:0 6px}
 .dash.hs .ntc-row{background:transparent;border-radius:0;border-bottom:1px solid var(--line);padding:10px 0 10px 12px;box-shadow:inset 3px 0 0 var(--amber)}
 .dash.hs .ntc-row.exp{box-shadow:inset 3px 0 0 var(--red)}
 .dash.hs .ntc-who{background:var(--surface);font-size:13px}
-@media (min-width:900px){ .dash.hs .ntc-row{flex-wrap:nowrap} .dash.hs .ntc-tx{flex:1 1 auto} .dash.hs .ntc-side{flex:0 0 auto;flex-direction:column;align-items:flex-end} .dash.hs .ntc-side:empty{display:none} }
+.dash.hs .ntc-tx{flex:1 1 160px}
 .dash.hs .tk{background:transparent!important;border-radius:0;border-bottom:1px solid var(--line);margin:0;padding:11px 0;box-shadow:none!important}
 .dash.hs .tk.esc .tk-tt{color:var(--red)} .dash.hs .tk.carry .tk-tt{color:#8A5A10}
 .dash.hs .tk-sec{margin:10px 0 0;font-size:12px;color:var(--muted)}
@@ -232,7 +234,7 @@ main{flex:1;padding-block:14px 120px;padding-left:max(16px,env(safe-area-inset-l
   .dash.hs .tk-meta .mini,.dash.hs .tk-meta .link-btn,.dash.hs .tk-meta select{display:none}
   .dash.hs .tk:hover .tk-meta .mini,.dash.hs .tk:hover .tk-meta .link-btn,.dash.hs .tk:hover .tk-meta select,.dash.hs .tk:focus-within .tk-meta select{display:inline-block}
   .dash.hs .tk.esc .tk-meta select{display:inline-block}
-  .dash.hs .ntc-row .mini{visibility:hidden} .dash.hs .ntc-row:hover .mini{visibility:visible}
+  .dash.hs .ntc-row .mini{display:none} .dash.hs .ntc-row:hover .mini{display:inline-block}
   .dash.hs .chk-acts .mini:not(.ok){visibility:hidden} .dash.hs .chk-row:hover .chk-acts .mini{visibility:visible}
 }
 @media (min-width:900px){
@@ -582,6 +584,10 @@ html,body{background:var(--page);margin:0}
     if(!need.length) return; repBusy=true;
     for(const r of need){ try{ await S.db.collection("tasks").add({branch:r.branch,title:r.title,dueDate:t,repeatId:r.id,createdBy:S.uid||"",createdAt:new Date().toISOString()}); }catch(_){ } }
     repBusy=false; }
+  const ntcRow=({n,exp})=>{const sn=stuName(n.studentId);return `<div class="ntc-row ${exp?"exp":""}">
+          ${sn?`<button class="ntc-who" data-gostu="${n.studentId}">${esc(sn)}</button>`:`<span class="ntc-who com">규칙</span>`}
+          <div class="ntc-tx">${esc(n.content)}</div>
+          <div class="ntc-side">${n.until?`<span class="chip ${exp?"c-warn":"c-mute"}">${exp?"종료일 지남 · 해제 확인":"~"+fmt(n.until)}</span>`:""}${canWrite()?`<button class="mini" data-act="ntc-off" data-id="${n.id}">해제</button>`:""}</div></div>`};
   function taskRow(o){ const x=o.x, cw=canWrite(), sn=stuName(x.studentId);
     const cls=x.done?"done":o.age>=2&&!x.assignee?"esc":o.age>=1?"carry":"";
     return `<div class="tk ${cls}"><button class="tk-ck" data-act="tk-done" data-id="${x.id}" ${cw?"":"disabled"} aria-label="${x.done?"완료 취소":"완료"}">${x.done?CHECK:""}</button>
@@ -920,10 +926,7 @@ html,body{background:var(--page);margin:0}
     ensureRepeats();
     m.innerHTML=`${S.err?`<p class="status">${esc(S.err)}</p>`:""}<div class="dash">
       <section class="w w-ntc"><div class="w-h"><h3>📢 고정 관리 사항</h3><span class="cnt">${NL.length}건</span>${canWrite()?`<button class="hadd ${S.hAdd==="ntc"?"on":""}" data-act="hadd" data-k="ntc" aria-label="고정 관리 사항 추가">${S.hAdd==="ntc"?"×":"+"}</button>`:""}</div>
-        ${NL.length?`<div class="ntc-list">${NL.map(({n,exp})=>{const sn=stuName(n.studentId);return `<div class="ntc-row ${exp?"exp":""}">
-          ${sn?`<button class="ntc-who" data-gostu="${n.studentId}">${esc(sn)}</button>`:`<span class="ntc-who com">${n.branch==="공통"?"공통":esc(n.branch)+"점"}</span>`}
-          <div class="ntc-tx">${esc(n.content)}</div>
-          <div class="ntc-side">${n.until?`<span class="chip ${exp?"c-warn":"c-mute"}">${exp?"종료일 지남 · 해제 확인":"~"+fmt(n.until)}</span>`:""}${canWrite()?`<button class="mini" data-act="ntc-off" data-id="${n.id}">해제</button>`:""}</div></div>`}).join("")}</div>`
+        ${NL.length?["공통","목동","사우"].filter(g=>!S.hBr||g==="공통"||g===S.hBr).map(g=>{ const L=NL.filter(o=>(o.n.branch||"공통")===g); return L.length?`<div class="ntc-g">${g==="공통"?"공통 (양 지점)":g+"점"} <span>${L.length}</span></div><div class="ntc-list">${L.map(ntcRow).join("")}</div>`:""; }).join("")
           :`<div class="w-empty">근무자 전원이 지켜야 할 규칙이 없습니다.</div>`}
         ${canWrite()&&S.hAdd==="ntc"?`<form id="ntcForm" class="addrow addbox"><input class="field" id="ntc-tx" placeholder="공통 규칙 (예: 기침하는 학생은 마스크 착용 지시)" autocomplete="off" value="${esc((S.hv||{})["ntc-tx"]||"")}"><select class="sel" id="ntc-br"><option value="공통" selected>공통</option><option value="목동">목동점</option><option value="사우">사우점</option></select><input class="field" id="ntc-until" type="date" title="종료일 (선택)" style="max-width:160px"><button class="qsave" type="submit">추가</button></form>
           <p class="hint" style="margin:0">학생별 규칙은 학생 화면 「+ 유지사항」에서 「📢 근무자 공지」를 체크하세요.</p>`:""}
