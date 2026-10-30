@@ -189,6 +189,7 @@ main{flex:1;padding-block:14px 120px;padding-left:max(16px,env(safe-area-inset-l
 .chk-sub{margin:6px 0 0;font-family:var(--title)}
 .slot{display:inline-flex;align-items:center;gap:4px;background:var(--blue-bg);color:var(--blue);border-radius:999px;padding:4px 10px;font-family:var(--title);font-size:13px}
 .slot button{border:0;background:none;color:inherit;cursor:pointer;padding:0 2px;font-size:12px}
+.slot-add{display:inline-flex;gap:6px;flex-wrap:wrap;align-items:center;background:var(--surface);border-radius:12px;padding:4px 6px}
 .fbar .slot-p{width:140px;flex:0 0 auto;padding:7px 10px;font-size:14px}
 .chk-hist{margin-top:10px;font-size:14px}
 .chk-hist summary{cursor:pointer;color:var(--muted);font-family:var(--title)}
@@ -646,7 +647,7 @@ html,body{background:var(--page);margin:0}
         ${cw&&st.next?`<div class="chk-acts"><button class="mini" data-act="chk-early" data-id="${s.id}">미리 점검함 → ${fmt(st.next.date)} 처리</button></div>`:""}</div>`;
     return `<div class="chk-box"><div class="sec" style="margin-top:0">📋 점검 일정</div>
       <div class="fbar">${st.sl.map((x,i)=>`<span class="slot">${esc(slotLabel(x))}${cw?`<button data-act="slot-del" data-id="${s.id}" data-i="${i}" aria-label="삭제">✕</button>`:""}</span>`).join("")}
-        ${cw?`<select class="sel" id="slot-d" aria-label="요일">${[1,2,3,4,5,6,0].map(d=>`<option value="${d}" ${S.slotD===String(d)?"selected":""}>${WD[d]}요일</option>`).join("")}</select><select class="sel" id="slot-n" aria-label="교시">${[1,2,3,4,5,6,7,8,9].map(n=>`<option value="${n}" ${S.slotN===String(n)?"selected":""}>${n}교시</option>`).join("")}<option value="" ${S.slotN===""?"selected":""}>교시 미정</option></select><button class="mini" data-act="slot-add" data-id="${s.id}">+ 요일 추가</button>`:""}</div>
+        ${cw?(S.slotOpen===s.id?`<span class="slot-add"><select class="sel" id="slot-d" aria-label="요일">${[1,2,3,4,5,6,0].map(d=>`<option value="${d}" ${S.slotD===String(d)?"selected":""}>${WD[d]}요일</option>`).join("")}</select><select class="sel" id="slot-n" aria-label="교시">${[1,2,3,4,5,6,7,8,9].map(n=>`<option value="${n}" ${S.slotN===String(n)?"selected":""}>${n}교시</option>`).join("")}<option value="" ${S.slotN===""?"selected":""}>교시 미정</option></select><button class="mini" data-act="slot-add" data-id="${s.id}">추가</button><button class="mini" data-act="slot-close">취소</button></span>`:`<button class="mini" data-act="slot-open" data-id="${s.id}">+ 점검 요일 추가</button>`):""}</div>
       ${status}
       ${hist.length?`<details class="chk-hist"><summary>점검 기록 ${checksOf(s.id).length}건</summary><ul>${hist.map(c=>`<li><span class="d">${fmt(c.doneDate)}</span> ${c.status==="완료"?`<b class="ok">완료</b>${c.dueDate!==c.doneDate?` <span class="sub">(${fmt(c.dueDate)} 점검분)</span>`:""}`:`<b class="ng">못 함</b> ${esc(c.reason)}${c.memo?" · "+esc(c.memo):""} <span class="sub">(${fmt(c.dueDate)} 점검분)</span>`} <span class="sub">${esc(nm(c.createdBy))}</span>${cw?` <button class="link-btn" data-act="chk-del" data-id="${c.id}">취소</button>`:""}</li>`).join("")}</ul></details>`:""}
     </div>`;
@@ -1255,10 +1256,12 @@ html,body{background:var(--page);margin:0}
     if(act==="g-del"){ if(!canWrite()) return; const s=S.students.find(x=>x.id===id); if(!s) return; const d=+b.dataset.d, n=+b.dataset.n;
       const sl=slotsOf(s).filter(x=>!(+x.d===d&&pNum(x)===n));
       try{ await S.db.doc("students/"+s.id).update({checkSlots:sl}); toast(`${s.name} ${WD[d]} ${n?n+"교시":""} 점검을 뺐습니다`); }catch(err){ fail(err); } return; }
+    if(act==="slot-open"){ S.slotOpen=id; render(); return; }
+    if(act==="slot-close"){ S.slotOpen=null; render(); return; }
     if(act==="slot-add"||act==="slot-del"){ if(!canWrite()) return; const s=S.students.find(x=>x.id===id); if(!s) return; let sl=slotsOf(s).slice();
       if(act==="slot-add"){ const d=$("#slot-d").value, nn=$("#slot-n").value, p=nn?nn+"교시":""; S.slotD=d; S.slotN=nn; if(sl.some(x=>String(x.d)===d&&(x.p||"")===p)){ toast("이미 있는 점검 일정입니다"); return; } sl.push({d:+d,p,s:today()}); sl.sort((a,b)=>((+a.d+6)%7)-((+b.d+6)%7)); }
       else sl.splice(+b.dataset.i,1);
-      try{ await S.db.doc("students/"+s.id).update({checkSlots:sl,...(s.checkSince?{}:{checkSince:today()})}); toast(act==="slot-add"?"점검 요일을 추가했습니다":"점검 요일을 삭제했습니다"); }catch(err){ fail(err); } return; }
+      try{ await S.db.doc("students/"+s.id).update({checkSlots:sl,...(s.checkSince?{}:{checkSince:today()})}); if(act==="slot-add"){ S.slotOpen=null; render(); } toast(act==="slot-add"?"점검 요일을 추가했습니다":"점검 요일을 삭제했습니다"); }catch(err){ fail(err); } return; }
     if(act==="chk-done"||act==="chk-early"){ if(!canWrite()) return; const s=S.students.find(x=>x.id===id); if(!s) return; const st=chkState(s);
       const due=act==="chk-early"?(st.next?st.next.date:today()):(st.pending.length?st.pending[st.pending.length-1].date:today());
       try{ await S.db.collection("checks").add({studentId:s.id,branch:s.branch,dueDate:due,status:"완료",doneDate:today(),reason:"",memo:"",createdBy:S.uid||"",createdAt:new Date().toISOString()}); toast(s.name+" 점검 완료"); }catch(err){ fail(err); } return; }
