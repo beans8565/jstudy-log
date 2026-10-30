@@ -773,7 +773,7 @@ html,body{background:var(--page);margin:0}
         :`<div class="w-empty">등록된 학생이 없습니다. 「학생 기록」에서 먼저 추가하세요.</div>`)
       :`<div class="sub">매뉴얼 항목은 상황·조치·근거를 함께 적어야 해서 입력창으로 엽니다.</div>
         <div class="qrow"><span style="flex:1"></span><button class="qsave" type="button" data-act="q-man">매뉴얼 항목 추가</button></div>`;
-    const CL=chkLists(), noSlot=S.students.filter(s=>s.active!==false&&!slotsOf(s).length).length;
+    const CL=chkLists(), noSlot=S.students.filter(s=>s.active!==false&&s.program!=="프리미엄"&&!slotsOf(s).length).length;
     m.innerHTML=`${S.err?`<p class="status">${esc(S.err)}</p>`:""}<div class="dash">
       <section class="w w-chk"><div class="w-h"><h3>점검</h3>${CL.over.length?`<span class="chip c-warn">밀림 ${CL.over.length}명</span>`:""}<span class="chip c-dir">오늘 ${CL.now.length}명</span></div>
         ${CL.over.length?`<div class="sub chk-sub">밀린 점검 — 완료할 때까지 매일 여기 남습니다</div>${CL.over.map(x=>chkRow(x.s,x.st)).join("")}`:""}
@@ -848,22 +848,24 @@ html,body{background:var(--page);margin:0}
     const cell={}, stc={}; let maxN=9, hasZero=false;
     studs.forEach(s=>{ stc[s.id]=chkState(s); slotsOf(s).forEach(x=>{ const n=pNum(x); if(!n) hasZero=true; if(n>maxN) maxN=n; (cell[+x.d+"-"+n]=cell[+x.d+"-"+n]||[]).push({s,x}); }); });
     const stat=(s,d,x)=>{ const st=stc[s.id]; if(d>t) return "fut"; const pd=st.pending.find(q=>q.date===d); if(pd) return d<t?"over":"now"; const since=x.s||s.checkSince; return since&&d>=since?"done":"pre"; };
-    const tray=studs.filter(s=>!slotsOf(s).length).sort((a,b)=>a.name.localeCompare(b.name,"ko"));
+    const prem=studs.filter(s=>s.program==="프리미엄"&&!slotsOf(s).length);
+    const tray=studs.filter(s=>!slotsOf(s).length&&s.program!=="프리미엄").sort((a,b)=>a.name.localeCompare(b.name,"ko"));
     const missOf=(s,d)=>{ const pd=stc[s.id].pending.find(x=>x.date===d); return pd&&pd.miss; };
     const rows=(hasZero?[0]:[]).concat(Array.from({length:maxN},(_,i)=>i+1));
-    const cw=canWrite()&&S.gEdit, cnt=studs.filter(s=>slotsOf(s).length).length;
+    const cw=canWrite()&&S.gEdit, cnt=studs.filter(s=>slotsOf(s).length).length, tot=studs.filter(s=>s.program!=="프리미엄"||slotsOf(s).length).length;
     const head=days.map(d=>{const w=wdIdx(d);return `<div class="gh ${d===t?"today":""} ${w===0?"sun":w===6?"sat":""}">${WD[w]}<span>${fmt(d)}</span></div>`}).join("");
     const body=rows.map(n=>`<div class="gp">${n?n+"교시":"미정"}</div>`+days.map(d=>{ const w=wdIdx(d), list=(cell[w+"-"+n]||[]).sort((a,b)=>a.s.name.localeCompare(b.s.name,"ko"));
       return `<div class="gc ${d===t?"today":""}" data-d="${w}" data-n="${n}">${list.map(({s,x})=>{const k=stat(s,d,x), ms=missOf(s,d);
         return `<span class="gs ${k} ${oc(s.owner)}" ${cw?`data-sid="${s.id}"`:`data-gostu="${s.id}" role="button" tabindex="0"`} title="${esc(s.name)} · ${k==="done"?"점검 완료":k==="over"?"밀림":k==="now"?"오늘 점검":k==="fut"?"예정":""}${ms?" · 못 함: "+esc(ms.reason):""}">${k==="done"?"✓ ":k==="over"?"! ":""}${esc(s.name)}${ms?" ⚠":""}${cw?`<button data-act="g-del" data-id="${s.id}" data-d="${w}" data-n="${n}" aria-label="${esc(s.name)} 빼기">✕</button>`:""}</span>`}).join("")}
         ${cw?`<button class="g-add" data-act="g-add" data-d="${w}" data-n="${n}" aria-label="${WD[w]} ${n}교시에 학생 추가">+</button>`:""}</div>`}).join("")).join("");
     return `<div class="g-top"><div class="bseg" style="margin:0">${["목동","사우"].map(b=>`<button data-gbr="${b}" aria-pressed="${br===b}">${b}점</button>`).join("")}</div>
-        <span class="sub" style="margin:0">점검 일정 있는 학생 ${cnt}/${studs.length}명</span><span style="flex:1"></span>
+        <span class="sub" style="margin:0">점검 일정 있는 학생 ${cnt}/${tot}명</span><span style="flex:1"></span>
         ${canWrite()?`<button class="mini ${S.gEdit?"ok":""}" data-act="g-edit">${S.gEdit?"편집 완료":"✎ 편집"}</button>`:""}</div>
       <div class="g-leg"><span class="gs done">✓ 완료</span><span class="gs now">오늘</span><span class="gs over">! 밀림</span><span class="gs fut">예정</span><span class="sub" style="margin:0">⚠ = 못 함 사유 있음 · 이름을 누르면 학생 화면</span></div>
       <div class="gwrap"><div class="grid7">${'<div class="gp gp-h"></div>'+head+body}</div></div>
       <div class="gtray gtray-bot ${cw?"edit":""}"><div class="gtray-h">미배정 ${tray.length}명${cw&&tray.length?` <span class="sub" style="margin:0">— 이름을 ${matchMedia("(pointer:coarse)").matches?"꾹 누른 채":"잡고"} 칸으로 끌어 넣기</span>`:""}</div>
-        <div class="gtray-b">${tray.map(s=>`<span class="gs fut ${oc(s.owner)}" ${cw?`data-sid="${s.id}"`:`data-gostu="${s.id}" role="button" tabindex="0"`}>${esc(s.name)}</span>`).join("")||'<span class="sub" style="margin:0">모든 학생이 배정됐습니다.</span>'}</div></div>
+        <div class="gtray-b">${tray.map(s=>`<span class="gs fut ${oc(s.owner)}" ${cw?`data-sid="${s.id}"`:`data-gostu="${s.id}" role="button" tabindex="0"`}>${esc(s.name)}</span>`).join("")||'<span class="sub" style="margin:0">모든 학생이 배정됐습니다.</span>'}</div>
+        ${prem.length?`<div class="sub" style="margin:8px 0 0">프리미엄 ${prem.length}명은 원장님 학습관리라 미배정에서 뺐습니다 (${esc(prem.map(s=>s.name).join(", "))}). 꼭 넣어야 하면 + 창에서 「이미 배정된 학생·프리미엄도 보기」를 체크하세요.</div>`:""}</div>
       ${S.gEdit?`<p class="hint" style="margin-top:8px">이름을 ${matchMedia("(pointer:coarse)").matches?"꾹 누른 채":"잡고"} 다른 칸으로 끌면 옮겨지고, 아래 「미배정」 칸으로 끌면 빠집니다. + 로 여러 명 한 번에 넣기, ✕ 로 빼기.</p>`:""}`;
   }
   function renderCal(){
@@ -1043,11 +1045,11 @@ html,body{background:var(--page);margin:0}
     if(S.sheet==="gslot"){
       const [d,n]=String(S.editId).split("|").map(Number), br=S.gBranch||S.branch;
       const cand=S.students.filter(s=>s.active!==false&&s.branch===br&&!slotsOf(s).some(x=>+x.d===d&&pNum(x)===n)).sort((a,b)=>(slotsOf(a).length?1:0)-(slotsOf(b).length?1:0)||a.name.localeCompare(b.name,"ko"));
-      const nAssigned=cand.filter(s=>slotsOf(s).length).length;
+      const nAssigned=cand.filter(s=>slotsOf(s).length||s.program==="프리미엄").length;
       root.innerHTML=wrap("gslotForm",`<h2>${br}점 ${WD[d]}요일 ${n?n+"교시":"(교시 미정)"} 점검</h2>
         <input class="search" id="gpick-q" type="text" placeholder="이름 검색 (Enter: 하나만 남으면 바로 체크)" autocomplete="off" style="margin:0">
-        <label class="gpk-all"><input type="checkbox" id="gpick-all"> 이미 배정된 학생도 보기 (${nAssigned}명 · 주 2회 이상 점검할 때)</label>
-        <div class="gpick">${cand.map(s=>`<label class="gpk" data-nm="${esc(s.name)}" ${slotsOf(s).length?'data-has="1" hidden':""}><input type="checkbox" name="gs" value="${s.id}"><span class="nm">${esc(s.name)}</span>${s.program?`<span class="pchip p-${esc(s.program)}">${esc(s.program)}</span>`:""}${slotsOf(s).length?`<span class="sub" style="margin:0">${esc(slotsOf(s).map(slotLabel).join(", "))}</span>`:""}</label>`).join("")||'<div class="sub">넣을 수 있는 학생이 없습니다.</div>'}</div>
+        <label class="gpk-all"><input type="checkbox" id="gpick-all"> 이미 배정된 학생·프리미엄도 보기 (${nAssigned}명 · 주 2회 이상 점검할 때)</label>
+        <div class="gpick">${cand.map(s=>`<label class="gpk" data-nm="${esc(s.name)}" ${slotsOf(s).length||s.program==="프리미엄"?'data-has="1" hidden':""}><input type="checkbox" name="gs" value="${s.id}"><span class="nm">${esc(s.name)}</span>${s.program?`<span class="pchip p-${esc(s.program)}">${esc(s.program)}</span>`:""}${slotsOf(s).length?`<span class="sub" style="margin:0">${esc(slotsOf(s).map(slotLabel).join(", "))}</span>`:""}</label>`).join("")||'<div class="sub">넣을 수 있는 학생이 없습니다.</div>'}</div>
         <button class="save" type="submit" id="gpick-go">추가</button>`);
       setTimeout(()=>$("#gpick-q")?.focus(),50);
     } else if(S.sheet==="miss"){
