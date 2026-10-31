@@ -308,6 +308,7 @@ main{flex:1;padding-block:14px 120px;padding-left:max(16px,env(safe-area-inset-l
 .gs.now{background:var(--blue-bg);color:var(--blue)}
 .gs.over{background:var(--red-bg);color:var(--red)}
 .gs.fut,.gs.pre{background:var(--surface);color:var(--fg)}
+.gs.prem{background:#FBF6E8;color:#7A5B12;border-left-color:#C9A13A!important}
 .g-leg .gs{cursor:default;border-left:0}
 .gs button{border:0;background:none;color:inherit;cursor:pointer;padding:0 0 0 2px;font-size:11px}
 .g-add{border:1px dashed var(--line);background:transparent;color:var(--muted);border-radius:7px;padding:1px 8px;cursor:pointer;font-size:14px}
@@ -617,6 +618,7 @@ html,body{background:var(--page);margin:0}
       sl.filter(x=>+x.d===w&&(!x.s||d>=x.s)).forEach(x=>pending.push({date:d,p:x.p||"",miss:cs.filter(c=>c.status==="미실시"&&c.dueDate===d).sort((a,b)=>(b.createdAt||"").localeCompare(a.createdAt||""))[0]||null})); }
     let next=null; for(let i=1;i<=7&&!next;i++){ const d=addDays(t,i); if(d<from) continue; const x=sl.find(x=>+x.d===wdIdx(d)&&(!x.s||d>=x.s)); if(x) next={date:d,p:x.p||""}; }
     const last=[...done].sort((a,b)=>(b.doneDate||"").localeCompare(a.doneDate||""))[0]||null;
+    if(s.program==="프리미엄") return {pending:[],over:[],now:[],next,sl,last,prem:true};
     return {pending,over:pending.filter(x=>x.date<t),now:pending.filter(x=>x.date===t),next,sl,last};
   }
   const lastMiss=st=>{ const m=st.pending.map(x=>x.miss).filter(Boolean); return m[m.length-1]||null; };
@@ -779,6 +781,7 @@ html,body{background:var(--page);margin:0}
   function chkSection(s){
     const st=chkState(s), cw=canWrite(), hist=[...checksOf(s.id)].sort((a,b)=>(b.createdAt||"").localeCompare(a.createdAt||"")).slice(0,6);
     const status=!st.sl.length?`<span class="sub" style="margin:0">점검 요일이 없습니다. 관리자 주간 시간표대로 등록하세요.</span>`
+      :st.prem?`<span class="sub" style="margin:0">프리미엄 — 원장님 컨설팅 일정입니다. 인지용으로만 표시하고 누락 경고는 띄우지 않습니다.${st.next?` 다음: ${fmt(st.next.date)}(${WD[wdIdx(st.next.date)]})${st.next.p?" "+esc(st.next.p):""}`:""}</span>`
       :st.over.length||st.now.length?chkRow(s,st)
       :`<div class="chk-row"><div class="chk-info"><span class="chip c-keep">밀린 점검 없음</span>${st.next?`<span class="sub" style="margin:0">다음 점검 ${fmt(st.next.date)}(${WD[wdIdx(st.next.date)]})${st.next.p?" "+esc(st.next.p):""}</span>`:""}</div>
         ${cw&&st.next?`<div class="chk-acts"><button class="mini" data-act="chk-early" data-id="${s.id}">미리 점검함 → ${fmt(st.next.date)} 처리</button></div>`:""}</div>`;
@@ -1026,7 +1029,7 @@ html,body{background:var(--page);margin:0}
     const studs=S.students.filter(s=>s.active!==false&&s.branch===br&&(!S.calOwn||(s.owner||"")===S.calOwn)&&(!S.gProg||(s.program||"")===S.gProg));
     const cell={}, stc={}; let maxN=9, hasZero=false;
     studs.forEach(s=>{ stc[s.id]=chkState(s); slotsOf(s).forEach(x=>{ const n=pNum(x); if(!n) hasZero=true; if(n>maxN) maxN=n; (cell[+x.d+"-"+n]=cell[+x.d+"-"+n]||[]).push({s,x}); }); });
-    const stat=(s,d,x)=>{ const st=stc[s.id]; if(d>t) return "fut"; const pd=st.pending.find(q=>q.date===d); if(pd) return d<t?"over":"now"; const since=x.s||s.checkSince; return since&&d>=since?"done":"pre"; };
+    const stat=(s,d,x)=>{ const st=stc[s.id]; if(st.prem) return "prem"; if(d>t) return "fut"; const pd=st.pending.find(q=>q.date===d); if(pd) return d<t?"over":"now"; const since=x.s||s.checkSince; return since&&d>=since?"done":"pre"; };
     const prem=studs.filter(s=>s.program==="프리미엄"&&!slotsOf(s).length);
     const tray=studs.filter(s=>!slotsOf(s).length&&s.program!=="프리미엄").sort((a,b)=>a.name.localeCompare(b.name,"ko"));
     const missOf=(s,d)=>{ const pd=stc[s.id].pending.find(x=>x.date===d); return pd&&pd.miss; };
@@ -1039,9 +1042,9 @@ html,body{background:var(--page);margin:0}
         ${cw?`<button class="g-add" data-act="g-add" data-d="${w}" data-n="${n}" aria-label="${WD[w]} ${n}교시에 학생 추가">+</button>`:""}</div>`}).join("")).join("");
     return `<div class="g-top"><div class="bseg" style="margin:0">${["목동","사우"].map(b=>`<button data-gbr="${b}" aria-pressed="${br===b}">${b}점</button>`).join("")}</div>
         <select class="sel" id="gprog" aria-label="프로그램">${[["","프로그램 전체"]].concat(PROGRAMS.map(x=>[x,x])).map(([v,l])=>`<option value="${v}" ${(S.gProg||"")===v?"selected":""}>${l}</option>`).join("")}</select>
-        <span class="sub" style="margin:0">점검 일정 있는 학생 ${cnt}/${tot}명</span><span style="flex:1"></span>
+        <span class="sub" style="margin:0">점검 일정 있는 학생 ${cnt}/${tot}명${(()=>{const pr=studs.filter(s=>s.program==="프리미엄"&&slotsOf(s).length);return pr.length?` · 원장님 컨설팅 ${pr.length}명`:"";})()}</span><span style="flex:1"></span>
         ${canWrite()?`<button class="mini ${S.gEdit?"ok":""}" data-act="g-edit">${S.gEdit?"편집 완료":"✎ 편집"}</button>`:""}</div>
-      <div class="g-leg"><span class="gs done">✓ 완료</span><span class="gs now">오늘</span><span class="gs over">! 밀림</span><span class="gs fut">예정</span><span class="sub" style="margin:0">${PROGRAMS.map(x=>`<i class="pt p-${esc(x)}">${esc(pLetter(x))}</i> ${esc(x)}`).join(" · ")} · ⚠ = 못 함 사유 있음 · 이름을 누르면 학생 화면</span></div>
+      <div class="g-leg"><span class="gs done">✓ 완료</span><span class="gs now">오늘</span><span class="gs over">! 밀림</span><span class="gs fut">예정</span><span class="gs prem">원장님 컨설팅(추적 안 함)</span><span class="sub" style="margin:0">${PROGRAMS.map(x=>`<i class="pt p-${esc(x)}">${esc(pLetter(x))}</i> ${esc(x)}`).join(" · ")} · ⚠ = 못 함 사유 있음 · 이름을 누르면 학생 화면</span></div>
       <div class="gwrap"><div class="grid7">${'<div class="gp gp-h"></div>'+head+body}</div></div>
       <div class="gtray gtray-bot ${cw?"edit":""}"><div class="gtray-h">미배정 ${tray.length}명${cw&&tray.length?` <span class="sub" style="margin:0">— 이름을 ${matchMedia("(pointer:coarse)").matches?"꾹 누른 채":"잡고"} 칸으로 끌어 넣기</span>`:""}</div>
         <div class="gtray-b">${tray.map(s=>`<span class="gs fut ${oc(s.owner)}" ${cw?`data-sid="${s.id}"`:`data-gostu="${s.id}" role="button" tabindex="0"`}>${ptag(s)}${esc(s.name)}</span>`).join("")||'<span class="sub" style="margin:0">모든 학생이 배정됐습니다.</span>'}</div>
